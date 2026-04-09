@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>English Sathi — Multi-Modal Learning</title>
+<style>
+/* ===== FONTS ===== */
+@font-face { font-family: 'JioType'; font-weight: 400; font-display: swap; src: url('https://raw.githubusercontent.com/sunit1986/JioBharatIQ_Server/main/assets/fonts/woff2/JioTypeVarW05-Regular.woff2') format('woff2'); }
+@font-face { font-family: 'JioType'; font-weight: 500; font-display: swap; src: url('https://raw.githubusercontent.com/sunit1986/JioBharatIQ_Server/main/assets/fonts/woff2/JioTypeW05-Medium.woff2') format('woff2'); }
+@font-face { font-family: 'JioType'; font-weight: 700; font-display: swap; src: url('https://raw.githubusercontent.com/sunit1986/JioBharatIQ_Server/main/assets/fonts/woff2/JioTypeW05-Bold.woff2') format('woff2'); }
+@font-face { font-family: 'JioType'; font-weight: 900; font-display: swap; src: url('https://raw.githubusercontent.com/sunit1986/JioBharatIQ_Server/main/assets/fonts/woff2/JioTypeW05-Black.woff2') format('woff2'); }
+
+/* ===== TOKENS ===== */
+:root {
+  --primary: #3535f3; --primary-light: #e8e8fc; --primary-dark: #3900ad;
+  --secondary: #f7ab20; --sparkle: #1eccb0; --error: #fa2f40; --success: #25ab21;
+  --grey-100: #141414; --grey-80: #5c5c5c; --grey-60: #8f8f8f; --grey-40: #e0e0e0; --grey-20: #f5f5f5;
+  --surface-ghost: #eeeeef; --surface-bold: #3900ad; --white: #ffffff;
+  --r-sm: 8px; --r-md: 12px; --r-lg: 16px; --r-xl: 23px; --r-pill: 999px;
+  --dark-bg: linear-gradient(180deg, #08081a 0%, #0d1528 100%);
+  --call-bg: linear-gradient(180deg, #0a0a1e 0%, #0f2847 50%, #0a1628 100%);
+}
+
+/* ===== RESET ===== */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; overflow: hidden; }
+body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+
+/* ===== PHONE FRAME ===== */
+.phone-frame { width: 360px; height: 800px; border-radius: 40px; overflow: hidden; position: relative; background: var(--grey-100); box-shadow: 0 0 0 2px rgba(0,0,0,0.08), 0 24px 80px rgba(0,0,0,0.15); flex-shrink: 0; }
+.screen { position: absolute; inset: 0; overflow: hidden; }
+
+/* ===== NAV HEADER ===== */
+.nav-header { position: absolute; top: 0; left: 0; right: 0; z-index: 150; display: flex; align-items: center; gap: 12px; padding: 14px 16px 8px; transition: color 0.3s; }
+.nav-header.dark { color: rgba(255,255,255,0.7); }
+.nav-header.light { color: var(--grey-80); }
+.back-btn { width: 36px; height: 36px; border-radius: 50%; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; color: inherit; transition: background 0.2s; flex-shrink: 0; }
+.back-btn:active { background: rgba(128,128,128,0.15); }
+.nav-title { font-size: 15px; font-weight: 700; }
+
+/* ===== PROGRESS ===== */
+.progress { position: absolute; top: 56px; left: 0; right: 0; z-index: 100; display: flex; gap: 3px; padding: 0 20px; }
+.p-seg { flex: 1; height: 3px; border-radius: 2px; background: rgba(128,128,128,0.2); transition: background 0.4s; }
+.p-seg.done { background: var(--primary); }
+.p-seg.now { background: var(--primary); opacity: 0.65; }
+
+/* ===== MOMENT (shared) ===== */
+.moment { position: absolute; inset: 0; display: flex; flex-direction: column; opacity: 0; pointer-events: none; }
+.moment.active { opacity: 1; pointer-events: auto; animation: momentIn 0.35s ease-out; }
+
+/* ===== MOMENT 1 — VOICE-FIRST GREETING ===== */
+#m1 { background: var(--dark-bg); align-items: center; justify-content: center; }
+.m1-center { position: relative; display: flex; flex-direction: column; align-items: center; }
+.avatar-vid { width: 140px; height: 140px; border-radius: 0; object-fit: cover; position: relative; z-index: 1; transition: opacity 0.2s ease; background: transparent; margin-top: -60px; mix-blend-mode: screen; }
+.m1-prompt { position: absolute; bottom: 140px; left: 0; right: 0; display: flex; flex-direction: column; align-items: center; gap: 14px; opacity: 0; transition: opacity 0.6s ease; pointer-events: none; z-index: 12; }
+.m1-prompt.show { opacity: 1; pointer-events: auto; }
+.mic-cta { width: 64px; height: 64px; border-radius: 50%; background: var(--primary); color: var(--white); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 24px rgba(53,53,243,0.4); transition: transform 0.15s; }
+.mic-cta:active { transform: scale(0.9); }
+.m1-tap { font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.5); }
+
+/* ===== AURORA (Gemini-style ambient glow) ===== */
+.aurora { position: absolute; bottom: -40px; left: 0; right: 0; height: 200px; pointer-events: none; z-index: 10; transition: opacity 0.5s; }
+.aurora-band { position: absolute; left: -20%; right: -20%; height: 2px; border-radius: 50%; }
+.ab1 { bottom: 100px; background: #3535f3; box-shadow: 0 0 80px 40px rgba(53,53,243,0.6), 0 0 160px 80px rgba(53,53,243,0.25); animation: abDrift1 5s ease-in-out infinite; }
+.ab2 { bottom: 110px; background: #6464ff; box-shadow: 0 0 60px 30px rgba(100,100,255,0.4), 0 0 120px 60px rgba(100,100,255,0.15); animation: abDrift2 7s ease-in-out infinite; }
+.ab3 { bottom: 90px; background: #1eccb0; box-shadow: 0 0 50px 25px rgba(30,204,176,0.3), 0 0 100px 50px rgba(30,204,176,0.1); animation: abDrift3 6s ease-in-out infinite; }
+.aurora.speaking .ab1 { animation-duration: 2.5s; box-shadow: 0 0 100px 50px rgba(53,53,243,0.8), 0 0 200px 100px rgba(53,53,243,0.35); }
+.aurora.speaking .ab2 { animation-duration: 3.5s; box-shadow: 0 0 80px 40px rgba(100,100,255,0.6), 0 0 160px 80px rgba(100,100,255,0.25); }
+.aurora.speaking .ab3 { animation-duration: 3s; box-shadow: 0 0 70px 35px rgba(30,204,176,0.45), 0 0 140px 70px rgba(30,204,176,0.15); }
+
+/* ===== VOICE STRIP (persistent bottom waveform) ===== */
+.voice-strip { position: absolute; bottom: 10px; left: 0; right: 0; z-index: 250; display: flex; align-items: center; justify-content: center; gap: 2px; height: 24px; pointer-events: none; opacity: 0; transition: opacity 0.4s; }
+.voice-strip.active { opacity: 1; }
+.voice-strip span { width: 2.5px; border-radius: 99px; height: 4px; }
+.voice-strip.on-dark span { background: rgba(255,255,255,0.4); }
+.voice-strip.on-light span { background: rgba(53,53,243,0.4); }
+.voice-strip.active span { animation: vsBar 0.7s ease-in-out infinite; animation-delay: calc(var(--d) * 0.04s); }
+
+/* ===== MOMENT 2 — SCENARIO (VOICE-LED + SCREEN) ===== */
+#m2 { background: var(--white); align-items: center; justify-content: center; padding: 20px; padding-top: 72px; }
+.m2-coach { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+.coach-dot { width: 28px; height: 28px; display: grid; grid-template-columns: 1fr 1fr; gap: 3px; flex-shrink: 0; }
+.coach-dot span { border-radius: 50%; }
+.coach-dot span:nth-child(1) { background: #3535f3; }
+.coach-dot span:nth-child(2) { background: #f7ab20; }
+.coach-dot span:nth-child(3) { background: #6464ff; }
+.coach-dot span:nth-child(4) { background: #1eccb0; }
+.m2-coach span { font-size: 14px; font-weight: 700; color: var(--grey-100); }
+.scenario-card { background: var(--white); border: 1.5px solid var(--grey-40); border-radius: var(--r-lg); padding: 28px 24px; width: 100%; max-width: 300px; text-align: center; opacity: 0; transform: translateY(16px); transition: all 0.5s ease; }
+.scenario-card.show { opacity: 1; transform: translateY(0); }
+.sc-tag { display: inline-block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--primary); background: var(--primary-light); padding: 4px 12px; border-radius: var(--r-pill); margin-bottom: 16px; }
+.sc-icon { width: 56px; height: 56px; border-radius: var(--r-md); background: var(--primary); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; color: var(--white); }
+.sc-en { font-size: 18px; font-weight: 900; color: var(--grey-100); line-height: 1.3; margin-bottom: 8px; }
+.sc-hi { font-size: 14px; color: var(--grey-80); line-height: 1.4; margin-bottom: 16px; }
+.sc-hint { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--grey-60); background: var(--grey-20); padding: 10px 14px; border-radius: var(--r-sm); text-align: left; }
+.sc-hint svg { flex-shrink: 0; color: var(--secondary); }
+.m2-wave { display: flex; align-items: center; gap: 8px; margin-top: 20px; opacity: 0; transition: opacity 0.4s; }
+.m2-wave.show { opacity: 1; }
+.m2-wave > span { font-size: 12px; color: var(--grey-60); font-weight: 500; }
+.mini-bars { display: flex; gap: 2px; align-items: center; height: 20px; }
+.mini-bars span { width: 3px; border-radius: 99px; background: var(--primary); animation: miniWave 0.7s ease-in-out infinite; }
+.mini-bars span:nth-child(1) { animation-delay: 0s; }
+.mini-bars span:nth-child(2) { animation-delay: 0.1s; }
+.mini-bars span:nth-child(3) { animation-delay: 0.2s; }
+.mini-bars span:nth-child(4) { animation-delay: 0.3s; }
+.mini-bars span:nth-child(5) { animation-delay: 0.4s; }
+
+/* ===== MOMENT 3 — USER SPEAKS (VOICE-FIRST) ===== */
+#m3 { background: var(--dark-bg); align-items: center; justify-content: center; }
+.m3-center { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+.m3-status { font-size: 14px; font-weight: 700; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; }
+.wave-bars { display: flex; gap: 3px; align-items: center; height: 48px; }
+.wave-bars span { width: 4px; border-radius: 99px; background: var(--primary); height: 8px; transition: height 0.3s, opacity 0.3s; }
+.wave-bars.active span { animation: waveBar 0.7s ease-in-out infinite; animation-delay: calc(var(--d) * 0.07s); }
+.mic-main { width: 80px; height: 80px; border-radius: 50%; background: var(--primary); color: var(--white); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; box-shadow: 0 4px 30px rgba(53,53,243,0.35); }
+.mic-main:active { transform: scale(0.9); }
+.mic-main.recording { background: var(--error); animation: micPulse 1.2s infinite; }
+.m3-label { font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.4); }
+.m3-transcript { position: absolute; bottom: 100px; left: 20px; right: 20px; text-align: center; opacity: 0; transition: opacity 0.5s; }
+.m3-input { position: absolute; bottom: 24px; left: 16px; right: 16px; z-index: 12; }
+.m3-transcript.show { opacity: 1; }
+.m3-transcript p { font-size: 15px; color: rgba(255,255,255,0.7); font-style: italic; line-height: 1.5; }
+
+/* ===== MOMENT 4 — CORRECTION (VOICE-LED + SCREEN) ===== */
+#m4 { background: var(--white); }
+.m4-scroll { flex: 1; overflow-y: auto; padding: 72px 20px 24px; display: flex; flex-direction: column; gap: 14px; }
+.m4-scroll::-webkit-scrollbar { width: 0; }
+.m4-head { display: flex; align-items: center; gap: 8px; }
+.m4-head .coach-dot { width: 24px; height: 24px; }
+.m4-head span { font-size: 13px; font-weight: 700; color: var(--grey-60); }
+.correct-card { background: var(--grey-100); border-radius: var(--r-lg); padding: 20px; color: var(--white); }
+.cc-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--sparkle); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+.cc-text { font-size: 18px; font-weight: 700; line-height: 1.4; }
+.fix-card { background: var(--white); border: 1.5px solid var(--grey-40); border-radius: var(--r-md); padding: 14px 16px; }
+.fix-wrong { font-size: 13px; color: var(--error); font-weight: 700; margin-bottom: 4px; }
+.fix-right { font-size: 13px; color: var(--success); font-weight: 700; margin-bottom: 8px; }
+.m4-actions { display: flex; gap: 10px; padding-top: 6px; }
+.btn-ghost { flex: 1; padding: 14px; border-radius: var(--r-pill); border: 1.5px solid var(--primary); background: transparent; color: var(--primary); font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'JioType'; transition: all 0.2s; }
+.btn-ghost:active { background: var(--primary-light); }
+.btn-fill { flex: 1; padding: 14px; border-radius: var(--r-pill); border: none; background: var(--primary); color: var(--white); font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'JioType'; transition: all 0.2s; }
+.btn-fill:active { opacity: 0.85; }
+
+/* ===== MOMENT 5 — PRACTICE CALL ===== */
+#m5 { background: var(--call-bg); }
+.call-top { flex-shrink: 0; text-align: center; padding: 68px 20px 0; color: var(--white); }
+.call-av-wrap { position: relative; width: 100px; height: 100px; margin: 0 auto 12px; }
+.call-av-ring { position: absolute; inset: -6px; border-radius: 50%; border: 2px solid rgba(53,53,243,0.4); animation: ringPulse 2s ease-in-out infinite; }
+.call-av { width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-light), var(--primary)); display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: 900; color: var(--white); position: relative; }
+.call-name { font-size: 20px; font-weight: 900; }
+.call-role { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.4); font-weight: 700; margin-top: 2px; }
+.call-stat { font-size: 13px; color: var(--sparkle); font-weight: 700; margin-top: 12px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.dot-pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--sparkle); animation: dotPulse 1.5s infinite; display: inline-block; }
+.call-time { font-size: 12px; color: rgba(255,255,255,0.25); font-variant-numeric: tabular-nums; margin-top: 4px; }
+.call-waves { flex-shrink: 0; display: flex; gap: 4px; align-items: center; justify-content: center; height: 40px; margin: 12px 0; }
+.call-waves span { width: 4px; border-radius: 99px; background: var(--primary); animation: callWave 1s ease-in-out infinite; animation-delay: calc(var(--d) * 0.1s); }
+.call-waves.muted span { animation: none; height: 4px; opacity: 0.2; }
+.call-body { flex: 1; overflow-y: auto; padding: 0 16px; }
+.call-body::-webkit-scrollbar { width: 0; }
+.ct-panel { background: rgba(255,255,255,0.06); border-radius: var(--r-md); padding: 14px 16px; border: 1px solid rgba(255,255,255,0.06); margin-bottom: 10px; animation: slideUp 0.35s ease-out; }
+.ct-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.3); margin-bottom: 10px; }
+.ct-ai-name { font-size: 11px; font-weight: 700; color: var(--sparkle); margin-bottom: 4px; }
+.ct-ai-text { font-size: 14px; line-height: 1.5; color: rgba(255,255,255,0.85); }
+.ct-you-label { font-size: 11px; font-weight: 700; color: var(--secondary); margin-top: 12px; margin-bottom: 4px; }
+.ct-you-text { font-size: 13px; color: rgba(255,255,255,0.5); font-style: italic; line-height: 1.4; }
+.cf-panel { background: rgba(255,255,255,0.04); border-radius: var(--r-md); padding: 14px 16px; border-left: 3px solid var(--secondary); margin-bottom: 10px; animation: slideUp 0.35s ease-out; }
+.cf-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--secondary); margin-bottom: 8px; }
+.cf-row { margin-bottom: 6px; }
+.cf-row .wrong { color: rgba(255,255,255,0.5); font-size: 12px; text-decoration: line-through; }
+.cf-row .right { color: var(--sparkle); font-size: 13px; font-weight: 700; margin-left: 6px; }
+.cf-why { font-size: 11px; color: rgba(255,255,255,0.45); line-height: 1.4; margin-top: 4px; }
+.call-bar { flex-shrink: 0; padding: 12px 16px 28px; }
+
+/* ===== INPUT BAR (shared text + mic) ===== */
+.input-bar { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); border-radius: var(--r-pill); padding: 6px 6px 6px 16px; transition: border-color 0.2s; }
+.input-bar:focus-within { border-color: rgba(255,255,255,0.3); }
+.text-input { flex: 1; background: none; border: none; outline: none; color: rgba(255,255,255,0.85); font-family: 'JioType', sans-serif; font-size: 14px; min-width: 0; }
+.text-input::placeholder { color: rgba(255,255,255,0.3); }
+.input-mic { width: 40px; height: 40px; border-radius: 50%; border: none; background: var(--primary); color: var(--white); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; }
+.input-mic:active { transform: scale(0.9); }
+.input-mic.hot { box-shadow: 0 0 0 4px rgba(53,53,243,0.3), 0 0 16px rgba(53,53,243,0.3); }
+/* Light theme variant */
+.input-bar.light { background: var(--surface-ghost); border-color: var(--grey-40); }
+.input-bar.light .text-input { color: var(--grey-100); }
+.input-bar.light .text-input::placeholder { color: var(--grey-60); }
+.cs-panel { background: rgba(255,255,255,0.06); border-radius: var(--r-md); padding: 14px 16px; margin-bottom: 10px; animation: slideUp 0.35s ease-out; }
+.cs-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--sparkle); margin-bottom: 10px; }
+.cs-item { font-size: 13px; line-height: 1.8; color: rgba(255,255,255,0.8); }
+.cs-item strong { color: var(--white); }
+
+/* ===== MOMENT 6 — SUMMARY ===== */
+#m6 { background: var(--white); }
+.m6-scroll { flex: 1; overflow-y: auto; padding: 72px 20px 24px; display: flex; flex-direction: column; gap: 16px; }
+.m6-scroll::-webkit-scrollbar { width: 0; }
+.sum-hero { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border-radius: var(--r-lg); padding: 28px 20px; color: var(--white); text-align: center; }
+.sum-badge { width: 56px; height: 56px; border-radius: 50%; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; }
+.sum-title { font-size: 20px; font-weight: 900; margin-bottom: 4px; }
+.sum-hi { font-size: 14px; opacity: 0.75; margin-bottom: 16px; }
+.sum-stats { display: flex; gap: 12px; justify-content: center; }
+.stat { background: rgba(255,255,255,0.12); border-radius: var(--r-sm); padding: 10px 16px; text-align: center; flex: 1; }
+.stat-val { font-size: 18px; font-weight: 900; }
+.stat-lbl { font-size: 10px; opacity: 0.6; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+.sum-section { background: var(--white); border: 1.5px solid var(--grey-40); border-radius: var(--r-lg); padding: 16px; }
+.sum-section h3 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--grey-60); margin-bottom: 12px; }
+.sf-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; font-size: 13px; border-bottom: 1px solid var(--grey-20); }
+.sf-row:last-child { border-bottom: none; }
+.sf-wrong { color: var(--error); text-decoration: line-through; flex: 1; }
+.sf-arrow { color: var(--grey-40); }
+.sf-right { color: var(--success); font-weight: 700; flex: 1; }
+.sp-item { padding: 6px 0; font-size: 13px; font-weight: 700; color: var(--grey-100); border-bottom: 1px solid var(--grey-20); }
+.sp-item:last-child { border-bottom: none; }
+.m6-actions { display: flex; gap: 10px; }
+
+/* ===== ANIMATIONS ===== */
+@keyframes momentIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes abDrift1 { 0%, 100% { transform: translateX(0) scaleX(1); opacity: 0.8; } 50% { transform: translateX(3%) scaleX(1.05); opacity: 1; } }
+@keyframes abDrift2 { 0%, 100% { transform: translateX(0) scaleX(1); opacity: 0.6; } 50% { transform: translateX(-4%) scaleX(1.08); opacity: 0.85; } }
+@keyframes abDrift3 { 0%, 100% { transform: translateX(0) scaleX(1); opacity: 0.5; } 50% { transform: translateX(2%) scaleX(1.03); opacity: 0.7; } }
+@keyframes vsBar { 0%, 100% { height: 4px; opacity: 0.3; } 50% { height: 16px; opacity: 0.8; } }
+@keyframes miniWave { 0%, 100% { height: 4px; } 50% { height: 16px; } }
+@keyframes waveBar { 0%, 100% { height: 8px; opacity: 0.3; } 50% { height: 36px; opacity: 1; } }
+@keyframes micPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(250,47,64,0.4); } 50% { box-shadow: 0 0 0 18px rgba(250,47,64,0); } }
+@keyframes callWave { 0%, 100% { height: 6px; opacity: 0.3; } 50% { height: 32px; opacity: 1; } }
+@keyframes ringPulse { 0%, 100% { opacity: 0.4; transform: scale(1); } 50% { opacity: 0.8; transform: scale(1.06); } }
+@keyframes dotPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  body { background: #000 !important; padding: 0 !important; }
+  .phone-frame { width: 100% !important; height: 100vh !important; height: 100dvh !important; border-radius: 0 !important; box-shadow: none !important; max-width: 100% !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== PHONE FRAME ===== -->
+<div class="phone-frame">
+  <div class="screen">
+    <!-- Nav Header -->
+    <div class="nav-header dark" id="navHeader">
+      <button class="back-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19 11H7.83l4.88-4.88a1.008 1.008 0 00-1.42-1.42l-6.59 6.59a1 1 0 000 1.42l6.59 6.59a1.002 1.002 0 001.639-.325 1 1 0 00-.22-1.095L7.83 13H19a1 1 0 000-2z"/></svg>
+      </button>
+      <span class="nav-title">English Sathi</span>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress" id="progress">
+      <div class="p-seg now"></div><div class="p-seg"></div><div class="p-seg"></div>
+      <div class="p-seg"></div><div class="p-seg"></div><div class="p-seg"></div>
+    </div>
+
+    <!-- Voice Activity Strip -->
+    <div class="voice-strip on-dark" id="voiceStrip">
+      <span style="--d:0"></span><span style="--d:1"></span><span style="--d:2"></span>
+      <span style="--d:3"></span><span style="--d:4"></span><span style="--d:5"></span>
+      <span style="--d:6"></span><span style="--d:7"></span><span style="--d:8"></span>
+      <span style="--d:9"></span><span style="--d:10"></span><span style="--d:11"></span>
+      <span style="--d:12"></span><span style="--d:13"></span><span style="--d:14"></span>
+      <span style="--d:15"></span><span style="--d:16"></span><span style="--d:17"></span>
+      <span style="--d:18"></span><span style="--d:19"></span><span style="--d:20"></span>
+      <span style="--d:21"></span><span style="--d:22"></span><span style="--d:23"></span>
+    </div>
+
+    <!-- M1: Voice-First Greeting -->
+    <section class="moment active" id="m1">
+      <div class="m1-center">
+        <video id="m1Vid" class="avatar-vid" autoplay loop muted playsinline></video>
+      </div>
+      <div class="aurora" id="m1Aurora">
+        <div class="aurora-band ab1"></div>
+        <div class="aurora-band ab2"></div>
+        <div class="aurora-band ab3"></div>
+      </div>
+      <div class="m1-prompt" id="m1Prompt">
+        <button class="mic-cta" onclick="onM1Tap()">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M12 15a3 3 0 003-3V5a3 3 0 00-6 0v7a3 3 0 003 3zm6-5a1 1 0 00-1 1v1a5 5 0 01-10 0v-1a1 1 0 10-2 0v1a7 7 0 1014 0v-1a1 1 0 00-1-1zm-3 10H9a1 1 0 000 2h6a1 1 0 000-2z"/></svg>
+        </button>
+        <div class="m1-tap">Tap to begin</div>
+      </div>
+    </section>
+
+    <!-- M2: Scenario -->
+    <section class="moment" id="m2">
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:72px 20px 20px;">
+        <div class="m2-coach">
+          <div class="coach-dot"><span></span><span></span><span></span><span></span></div>
+          <span>English Sathi</span>
+        </div>
+        <div class="scenario-card" id="m2Card">
+          <div class="sc-tag">OFFICE &middot; FORMAL</div>
+          <div class="sc-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M20 7h-4V5c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zM10 5h4v2h-4V5z"/></svg>
+          </div>
+          <div class="sc-en">Introduce yourself to your new team</div>
+          <div class="sc-hi">अपनी नई टीम से अपना परिचय दें</div>
+          <div class="sc-hint">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/></svg>
+            <span>Think about: your name, role, and why you're excited</span>
+          </div>
+        </div>
+        <div class="m2-wave" id="m2Wave">
+          <div class="mini-bars"><span></span><span></span><span></span><span></span><span></span></div>
+          <span>Speaking...</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- M3: User Speaks -->
+    <section class="moment" id="m3">
+      <div class="aurora" id="m3Aurora">
+        <div class="aurora-band ab1"></div>
+        <div class="aurora-band ab2"></div>
+        <div class="aurora-band ab3"></div>
+      </div>
+      <div class="m3-center">
+        <div class="m3-status" id="m3Status">Your turn</div>
+        <div class="wave-bars" id="m3Bars">
+          <span style="--d:0"></span><span style="--d:1"></span><span style="--d:2"></span>
+          <span style="--d:3"></span><span style="--d:4"></span><span style="--d:5"></span>
+          <span style="--d:6"></span><span style="--d:7"></span><span style="--d:8"></span>
+          <span style="--d:9"></span><span style="--d:10"></span>
+        </div>
+        <button class="mic-main" id="m3Mic" onclick="onM3Tap()">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="white"><path d="M12 15a3 3 0 003-3V5a3 3 0 00-6 0v7a3 3 0 003 3zm6-5a1 1 0 00-1 1v1a5 5 0 01-10 0v-1a1 1 0 10-2 0v1a7 7 0 1014 0v-1a1 1 0 00-1-1zm-3 10H9a1 1 0 000 2h6a1 1 0 000-2z"/></svg>
+        </button>
+        <div class="m3-label" id="m3Label">Tap to speak</div>
+      </div>
+      <div class="m3-transcript" id="m3Trans"><p></p></div>
+      <div class="m3-input">
+        <div class="input-bar">
+          <input type="text" class="text-input" placeholder="Or type here..." onkeydown="if(event.key==='Enter')onM3Tap()">
+          <button class="input-mic" onclick="onM3Tap()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 15a3 3 0 003-3V5a3 3 0 00-6 0v7a3 3 0 003 3zm6-5a1 1 0 00-1 1v1a5 5 0 01-10 0v-1a1 1 0 10-2 0v1a7 7 0 1014 0v-1a1 1 0 00-1-1zm-3 10H9a1 1 0 000 2h6a1 1 0 000-2z"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- M4: Correction -->
+    <section class="moment" id="m4">
+      <div class="m4-scroll" id="m4Scroll">
+        <div class="m4-head">
+          <div class="coach-dot"><span></span><span></span><span></span><span></span></div>
+          <span>Coach says...</span>
+        </div>
+        <div class="correct-card">
+          <div class="cc-label">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm5.21 7.71l-6 6a1 1 0 01-1.42 0l-3-3a1 1 0 111.42-1.42l2.29 2.3 5.29-5.3a1 1 0 011.42 1.42z"/></svg>
+            Better way to say it
+          </div>
+          <div class="cc-text">"Hi everyone, I'm Rahul. I've just joined the team today, and I'm really excited to be here."</div>
+        </div>
+        <div class="fix-card">
+          <div class="fix-wrong">&#10005; "I am working in this company from today"</div>
+          <div class="fix-right">&#10003; "I've just joined the team today"</div>
+        </div>
+        <div class="fix-card">
+          <div class="fix-wrong">&#10005; "I am very happy for joining"</div>
+          <div class="fix-right">&#10003; "I'm really excited to be here"</div>
+        </div>
+        <div class="m4-actions" id="m4Actions" style="opacity:0;transition:opacity 0.4s">
+          <button class="btn-fill" style="flex:none;width:100%" onclick="goFromM4()">Practice with AI</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- M5: Practice Call -->
+    <section class="moment" id="m5">
+      <div class="call-top">
+        <div class="call-av-wrap">
+          <div class="call-av-ring"></div>
+          <div class="call-av">P</div>
+        </div>
+        <div class="call-name">Priya</div>
+        <div class="call-role">Your Colleague</div>
+        <div class="call-stat" id="callStat"><span class="dot-pulse"></span> Connecting...</div>
+        <div class="call-time" id="callTime">00:00</div>
+      </div>
+      <div class="call-waves" id="callWaves">
+        <span style="--d:0"></span><span style="--d:1"></span><span style="--d:2"></span>
+        <span style="--d:3"></span><span style="--d:4"></span><span style="--d:5"></span>
+        <span style="--d:6"></span><span style="--d:7"></span><span style="--d:8"></span>
+      </div>
+      <div class="call-body" id="callBody"></div>
+      <div class="call-bar" id="callBar">
+        <div class="input-bar">
+          <input type="text" class="text-input" placeholder="Type your response..." onkeydown="if(event.key==='Enter')onCallMicTap()">
+          <button class="input-mic" id="callMic" onclick="onCallMicTap()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 15a3 3 0 003-3V5a3 3 0 00-6 0v7a3 3 0 003 3zm6-5a1 1 0 00-1 1v1a5 5 0 01-10 0v-1a1 1 0 10-2 0v1a7 7 0 1014 0v-1a1 1 0 00-1-1zm-3 10H9a1 1 0 000 2h6a1 1 0 000-2z"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- M6: Summary -->
+    <section class="moment" id="m6">
+      <div class="m6-scroll">
+        <div class="sum-hero">
+          <div class="sum-badge">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <div class="sum-title">Session Complete!</div>
+          <div class="sum-hi">बहुत अच्छा किया, राहुल!</div>
+          <div class="sum-stats">
+            <div class="stat"><div class="stat-val" id="sumTime">0:00</div><div class="stat-lbl">Duration</div></div>
+            <div class="stat"><div class="stat-val">8</div><div class="stat-lbl">Phrases</div></div>
+            <div class="stat"><div class="stat-val">5</div><div class="stat-lbl">Corrections</div></div>
+          </div>
+        </div>
+        <div class="sum-section">
+          <h3>Key Corrections</h3>
+          <div class="sf-row"><span class="sf-wrong">"I am working from today"</span><span class="sf-arrow">&rarr;</span><span class="sf-right">"I've just joined"</span></div>
+          <div class="sf-row"><span class="sf-wrong">"happy for joining"</span><span class="sf-arrow">&rarr;</span><span class="sf-right">"excited to be here"</span></div>
+          <div class="sf-row"><span class="sf-wrong">"doing job in Pune"</span><span class="sf-arrow">&rarr;</span><span class="sf-right">"working at a company"</span></div>
+          <div class="sf-row"><span class="sf-wrong">"making software"</span><span class="sf-arrow">&rarr;</span><span class="sf-right">"developing software"</span></div>
+          <div class="sf-row"><span class="sf-wrong">"good peoples"</span><span class="sf-arrow">&rarr;</span><span class="sf-right">"great people"</span></div>
+        </div>
+        <div class="sum-section">
+          <h3>Phrases Learned</h3>
+          <div class="sp-item">"I've just joined the team"</div>
+          <div class="sp-item">"I'm really excited to be here"</div>
+          <div class="sp-item">"I was working at an IT company"</div>
+          <div class="sp-item">"developing software for banks"</div>
+          <div class="sp-item">"looking forward to learning"</div>
+        </div>
+        <div class="m6-actions">
+          <button class="btn-fill" onclick="restart()">Practice Again</button>
+          <button class="btn-ghost" onclick="restart()">Back to Menu</button>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+// ===== CONFIG =====
+const API_KEY = 'sk_86a2daf2318ba84afa5190ff9a2c09fcc9e7f9dafea1fe79';
+const VOICE_ID = 'FaqthkZu1EWxXxUFbAfb';
+const TTS_URL = `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`;
+
+// ===== AVATAR VIDEOS =====
+const AV = {
+  idle:  'https://raw.githubusercontent.com/sunit1986/JioBharatIQ_Server/main/assets/states/Dark/HelloJio_Breath(IdleState)_242.mp4',
+  speak: 'https://raw.githubusercontent.com/sunit1986/JioBharatIQ_Server/main/assets/states/Dark/HelloJio_BotSpeaking_242.mp4',
+  listen:'https://raw.githubusercontent.com/sunit1986/JioBharatIQ_Server/main/assets/states/Dark/HelloJio_Listening_242.mp4',
+};
+
+// ===== VOICE TEXTS (asymmetric — different from screen) =====
+const V = {
+  m1: "Namaste! Main tumhara English learning saathi hoon. Aaj hum ek situation ke liye practice karenge. Socho ki tum ek new office mein apna introduction de rahe ho.",
+  m2: "Imagine you have just joined a new company. Your manager asks you to introduce yourself to the team. Try saying it in English.",
+  m4: "Great attempt! Here is a more natural way to say it. Hi everyone, I am Rahul. I have just joined the team today, and I am really excited to be here.",
+  m5r1: "Now let us practice! I will be your colleague Priya. Hey Rahul, nice to meet you! So what were you doing before joining us?",
+  m5c1: "Good! Small fix. Say, I was working at an IT company in Pune, instead of doing job in Pune. Working at sounds much more professional.",
+  m5r2: "That sounds interesting! What kind of projects were you working on there?",
+  m5c2: "Nice! Say developing software, not making software. And it is very interesting, not very much interesting.",
+  m5r3: "Great! What are you most looking forward to in this new role?",
+  m5c3: "Almost perfect! Say looking forward to, not looking forward for. And remember, people is already plural. You do not need to add an S.",
+  m6: "Bahut achha, Rahul! Aaj tumne teen important cheezein seekhi. Pehli, I have just joined use karo recent actions ke liye. Doosri, working at bolo, doing job nahi. Aur teesri, people already plural hai. Keep practicing!"
+};
+
+const U = {
+  m3: "Hello, I am Rahul. I am working in this company from today. I am very happy for joining.",
+  r1: "Before this I was doing job in Pune in a IT company.",
+  r2: "I was making software for banks. It was very much interesting work.",
+  r3: "I am looking forward for learning new things and meeting good peoples."
+};
+
+const ROUNDS = [
+  { aiVoice: V.m5r1, aiText: "Hey Rahul, nice to meet you! So what were you doing before joining us?", userText: U.r1, corrVoice: V.m5c1,
+    fixes: [{ w: '"doing job in Pune"', r: '"working at a company in Pune"', why: '"Working at" is the standard way to describe employment' }, { w: '"a IT company"', r: '"an IT company"', why: 'Use "an" before vowel sounds — IT starts with /aɪ/' }] },
+  { aiVoice: V.m5r2, aiText: "What kind of projects were you working on there?", userText: U.r2, corrVoice: V.m5c2,
+    fixes: [{ w: '"making software"', r: '"developing software"', why: '"Develop" is the professional term in tech' }, { w: '"very much interesting"', r: '"very interesting"', why: 'No "much" needed — use "very" directly with adjectives' }] },
+  { aiVoice: V.m5r3, aiText: "What are you most looking forward to in this new role?", userText: U.r3, corrVoice: V.m5c3,
+    fixes: [{ w: '"looking forward for"', r: '"looking forward to"', why: '"Look forward to" + gerund (learning, meeting)' }, { w: '"good peoples"', r: '"great people"', why: '"People" is already plural — never add S' }] }
+];
+
+// ===== AUDIO ENGINE =====
+const ttsCache = new Map();
+let currentAudio = null;
+let lastTtsUrl = null;
+let audioCtx = null;
+
+function unlockAudio() {
+  try { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if (audioCtx.state === 'suspended') audioCtx.resume(); } catch(e) {}
+}
+function stopAudio() { if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; currentAudio = null; } speechSynthesis.cancel(); setVoiceActive(false); }
+
+function speak(text, pace) {
+  pace = pace || 1.0;
+  return new Promise(async (resolve) => {
+    unlockAudio(); stopAudio();
+    const key = text + '|' + pace;
+    if (ttsCache.has(key)) { playUrl(ttsCache.get(key), resolve); return; }
+    try {
+      const res = await fetch(TTS_URL, { method: 'POST', headers: { 'xi-api-key': API_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, model_id: 'eleven_turbo_v2_5', voice_settings: { stability: 0.5, similarity_boost: 0.75, speed: pace } }) });
+      if (!res.ok) throw new Error('TTS ' + res.status);
+      const blob = await res.blob(); const url = URL.createObjectURL(blob); ttsCache.set(key, url); playUrl(url, resolve);
+    } catch(e) { console.warn('TTS fallback:', e); setVoiceActive(true); browserTTS(text, pace < 0.8 ? 0.65 : 0.85); const dur = Math.min(text.length * 65, 8000); setTimeout(() => { setVoiceActive(false); resolve(); }, dur); }
+  });
+}
+function playUrl(url, onend) { lastTtsUrl = url; const a = new Audio(url); currentAudio = a; setVoiceActive(true); a.onended = () => { setVoiceActive(false); if (onend) onend(); }; a.onerror = () => { setVoiceActive(false); if (onend) onend(); }; a.play().catch(() => { setVoiceActive(false); if (onend) setTimeout(onend, 500); }); }
+function browserTTS(text, rate) { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text); u.lang = 'en-US'; u.rate = rate || 0.85; speechSynthesis.speak(u); }
+function preCache(text, pace) { pace = pace || 1.0; const key = text + '|' + pace; if (ttsCache.has(key)) return;
+  fetch(TTS_URL, { method: 'POST', headers: { 'xi-api-key': API_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text, model_id: 'eleven_turbo_v2_5', voice_settings: { stability: 0.5, similarity_boost: 0.75, speed: pace } })
+  }).then(r => r.blob()).then(b => { ttsCache.set(key, URL.createObjectURL(b)); }).catch(() => {}); }
+
+// ===== AVATAR =====
+function setAvatar(vid, state) { if (!vid || vid.dataset.av === state) return; vid.dataset.av = state; vid.style.opacity = '0';
+  setTimeout(() => { vid.src = AV[state]; vid.load(); vid.play().catch(()=>{}); vid.style.opacity = '1'; }, 150); }
+
+// ===== STATE MACHINE =====
+let cur = 0; let gen = 0; let callTimerInt = null; let callSecs = 0; let sessionStart = 0; let micResolve = null; let micAutoTimer = null; let m4AutoTimer = null;
+const DARK_MOMENTS = [1, 3, 5];
+
+function setVoiceActive(on) {
+  const strip = document.getElementById('voiceStrip');
+  strip.classList.toggle('active', on);
+  // Aurora speaking state
+  document.querySelectorAll('.aurora').forEach(a => a.classList.toggle('speaking', on));
+}
+
+function goTo(n) {
+  document.querySelectorAll('.moment.active').forEach(el => { el.classList.remove('active'); });
+  const newEl = document.getElementById('m' + n);
+  if (newEl) newEl.classList.add('active');
+  cur = n;
+  updateProgress(n);
+  const isDark = DARK_MOMENTS.includes(n);
+  const nav = document.getElementById('navHeader');
+  nav.classList.toggle('dark', isDark);
+  nav.classList.toggle('light', !isDark);
+  // Update voice strip theme
+  const strip = document.getElementById('voiceStrip');
+  strip.classList.toggle('on-dark', isDark);
+  strip.classList.toggle('on-light', !isDark);
+}
+
+function updateProgress(n) {
+  document.querySelectorAll('.p-seg').forEach((s, i) => { s.classList.toggle('done', i < n - 1); s.classList.toggle('now', i === n - 1); });
+}
+
+function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
+function scrollCallBody() { const b = document.getElementById('callBody'); if (b) b.scrollTop = b.scrollHeight; }
+
+// ===== MOMENT 1 — GREETING (VOICE-FIRST) =====
+async function playM1() {
+  const g = gen; sessionStart = Date.now();
+  const vid = document.getElementById('m1Vid');
+  setAvatar(vid, 'speak');
+  preCache(V.m2);
+  await speak(V.m1);
+  if (g !== gen) return;
+  setAvatar(vid, 'idle');
+  document.getElementById('m1Prompt').classList.add('show');
+}
+function onM1Tap() { document.getElementById('m1Prompt').classList.remove('show'); playM2(); }
+
+// ===== MOMENT 2 — SCENARIO (VOICE-LED + SCREEN) =====
+async function playM2() {
+  const g = gen; goTo(2);
+  setTimeout(() => { document.getElementById('m2Card').classList.add('show'); }, 100);
+  document.getElementById('m2Wave').classList.add('show');
+  preCache(V.m4);
+  await speak(V.m2);
+  if (g !== gen) return;
+  document.getElementById('m2Wave').classList.remove('show');
+  await wait(1200);
+  if (g !== gen) return;
+  playM3();
+}
+
+// ===== MOMENT 3 — USER SPEAKS (VOICE-FIRST) =====
+async function playM3() {
+  const g = gen; goTo(3);
+  document.getElementById('m3Status').textContent = 'Your turn';
+  document.getElementById('m3Label').textContent = 'Tap to speak';
+  document.getElementById('m3Mic').classList.remove('recording');
+  document.getElementById('m3Bars').classList.remove('active');
+  document.getElementById('m3Trans').classList.remove('show');
+}
+async function onM3Tap() {
+  const g = gen;
+  const mic = document.getElementById('m3Mic');
+  const bars = document.getElementById('m3Bars');
+  const trans = document.getElementById('m3Trans');
+  if (mic.classList.contains('recording')) return;
+  mic.classList.add('recording'); bars.classList.add('active');
+  document.getElementById('m3Status').textContent = 'Listening...';
+  document.getElementById('m3Label').textContent = '';
+  await wait(2500);
+  if (g !== gen) return;
+  mic.classList.remove('recording'); bars.classList.remove('active');
+  document.getElementById('m3Status').textContent = '';
+  trans.querySelector('p').textContent = '"' + U.m3 + '"';
+  trans.classList.add('show');
+  await wait(2000);
+  if (g !== gen) return;
+  trans.classList.remove('show');
+  await wait(400);
+  if (g !== gen) return;
+  playM4();
+}
+
+// ===== MOMENT 4 — CORRECTION (VOICE-LED + SCREEN) =====
+async function playM4() {
+  const g = gen; goTo(4);
+  document.getElementById('m4Scroll').scrollTop = 0;
+  document.getElementById('m4Actions').style.opacity = '0';
+  preCache(V.m5r1); preCache(V.m5c1); preCache(V.m5r2);
+  await speak(V.m4);
+  if (g !== gen) return;
+  document.getElementById('m4Actions').style.opacity = '1';
+}
+function replayM4() { stopAudio(); speak(V.m4); }
+function goFromM4() { clearTimeout(m4AutoTimer); playM5(); }
+
+// ===== MOMENT 5 — PRACTICE CALL =====
+async function playM5() {
+  const g = gen; goTo(5);
+  document.getElementById('callBody').innerHTML = '';
+  resetCallBar();
+  startCallTimer();
+  preCache(V.m5c2); preCache(V.m5r3); preCache(V.m5c3); preCache(V.m6);
+  document.getElementById('callStat').innerHTML = '<span class="dot-pulse"></span> Connecting...';
+  document.getElementById('callWaves').classList.remove('muted');
+  await wait(800);
+  if (g !== gen) return;
+
+  for (let i = 0; i < ROUNDS.length; i++) { await playCallRound(i, g); if (g !== gen) return; if (i < ROUNDS.length - 1) await wait(800); }
+
+  document.getElementById('callStat').innerHTML = '<span class="dot-pulse" style="background:var(--secondary)"></span> Call ended';
+  document.getElementById('callWaves').classList.add('muted');
+  stopCallTimer();
+  const body = document.getElementById('callBody');
+  body.insertAdjacentHTML('beforeend', '<div class="cs-panel"><div class="cs-title">Session Summary</div><div class="cs-item"><strong>"working at"</strong> instead of "doing job"</div><div class="cs-item"><strong>"developing software"</strong> instead of "making"</div><div class="cs-item"><strong>"very interesting"</strong> not "very much interesting"</div><div class="cs-item"><strong>"looking forward to"</strong> not "for"</div><div class="cs-item"><strong>"people"</strong> is already plural</div></div>');
+  scrollCallBody();
+  document.getElementById('callBar').innerHTML = '<button class="btn-fill" style="max-width:200px;margin:0 auto" onclick="playM6()">View Summary</button>';
+  await wait(1500);
+  if (g !== gen) return;
+  playM6();
+}
+
+async function playCallRound(idx, g) {
+  const round = ROUNDS[idx]; const body = document.getElementById('callBody');
+  const mic = document.getElementById('callMic'); const waves = document.getElementById('callWaves');
+
+  if (mic) mic.classList.remove('hot');
+  waves.classList.remove('muted');
+  document.getElementById('callStat').innerHTML = '<span class="dot-pulse"></span> Priya is speaking...';
+  body.insertAdjacentHTML('beforeend', '<div class="ct-panel"><div class="ct-label">Live Transcript</div><div class="ct-ai-name">Priya</div><div class="ct-ai-text">' + round.aiText + '</div></div>');
+  scrollCallBody();
+  await speak(round.aiVoice);
+  if (g !== gen) return;
+
+  if (mic) mic.classList.add('hot');
+  waves.classList.add('muted');
+  document.getElementById('callStat').innerHTML = '<span class="dot-pulse" style="background:var(--white)"></span> Your turn — tap mic';
+  await waitForMic();
+  if (g !== gen) return;
+
+  if (mic) mic.classList.remove('hot');
+  document.getElementById('callStat').innerHTML = '<span class="dot-pulse" style="background:var(--error)"></span> Recording...';
+  await wait(2000);
+  if (g !== gen) return;
+
+  const panels = body.querySelectorAll('.ct-panel');
+  const last = panels[panels.length - 1];
+  if (last) last.insertAdjacentHTML('beforeend', '<div class="ct-you-label">You said:</div><div class="ct-you-text">"' + round.userText + '"</div>');
+  scrollCallBody();
+  await wait(500);
+  if (g !== gen) return;
+
+  waves.classList.remove('muted');
+  document.getElementById('callStat').innerHTML = '<span class="dot-pulse"></span> Priya is speaking...';
+  let fHtml = '<div class="cf-panel"><div class="cf-label">Quick Fix</div>';
+  round.fixes.forEach(f => { fHtml += '<div class="cf-row"><span class="wrong">' + f.w + '</span><span class="right">' + f.r + '</span></div><div class="cf-why">' + f.why + '</div>'; });
+  fHtml += '</div>';
+  body.insertAdjacentHTML('beforeend', fHtml);
+  scrollCallBody();
+  await speak(round.corrVoice);
+  if (g !== gen) return;
+  waves.classList.add('muted');
+}
+
+function waitForMic() { return new Promise(resolve => { micResolve = resolve; micAutoTimer = setTimeout(() => { if (micResolve) { micResolve(); micResolve = null; } }, 2500); }); }
+function onCallMicTap() { if (micResolve) { clearTimeout(micAutoTimer); micResolve(); micResolve = null; } }
+function replayCallTTS() { if (lastTtsUrl) { stopAudio(); playUrl(lastTtsUrl, null); } }
+function endCallNow() { stopCallTimer(); stopAudio(); playM6(); }
+function startCallTimer() { callSecs = 0; if (callTimerInt) clearInterval(callTimerInt);
+  callTimerInt = setInterval(() => { callSecs++; const m = String(Math.floor(callSecs/60)).padStart(2,'0'); const s = String(callSecs%60).padStart(2,'0'); const el = document.getElementById('callTime'); if (el) el.textContent = m+':'+s; }, 1000); }
+function stopCallTimer() { if (callTimerInt) { clearInterval(callTimerInt); callTimerInt = null; } }
+
+function resetCallBar() {
+  document.getElementById('callBar').innerHTML = `
+    <div class="input-bar">
+      <input type="text" class="text-input" placeholder="Type your response..." onkeydown="if(event.key==='Enter')onCallMicTap()">
+      <button class="input-mic" id="callMic" onclick="onCallMicTap()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 15a3 3 0 003-3V5a3 3 0 00-6 0v7a3 3 0 003 3zm6-5a1 1 0 00-1 1v1a5 5 0 01-10 0v-1a1 1 0 10-2 0v1a7 7 0 1014 0v-1a1 1 0 00-1-1zm-3 10H9a1 1 0 000 2h6a1 1 0 000-2z"/></svg>
+      </button>
+    </div>`;
+}
+
+// ===== MOMENT 6 — SUMMARY =====
+async function playM6() {
+  const g = gen; goTo(6);
+  const elapsed = Math.floor((Date.now() - sessionStart) / 1000);
+  document.getElementById('sumTime').textContent = Math.floor(elapsed/60) + ':' + String(elapsed%60).padStart(2,'0');
+  await speak(V.m6);
+}
+
+// ===== RESTART =====
+function restart() {
+  gen++; stopAudio(); stopCallTimer(); clearTimeout(micAutoTimer); clearTimeout(m4AutoTimer); micResolve = null;
+  document.getElementById('callBody').innerHTML = '';
+  document.getElementById('m2Card').classList.remove('show');
+  document.getElementById('m2Wave').classList.remove('show');
+  document.getElementById('m3Trans').classList.remove('show');
+  document.getElementById('m3Mic').classList.remove('recording');
+  document.getElementById('m3Bars').classList.remove('active');
+  document.getElementById('m4Actions').style.opacity = '0';
+  document.getElementById('m1Prompt').classList.remove('show');
+  resetCallBar();
+  goTo(1); playM1();
+}
+
+// ===== INIT =====
+document.addEventListener('click', unlockAudio, { once: true });
+document.addEventListener('touchstart', unlockAudio, { once: true });
+preCache(V.m1); preCache(V.m2);
+[AV.idle, AV.speak, AV.listen].forEach(url => { const v = document.createElement('video'); v.preload = 'auto'; v.src = url; });
+playM1();
+</script>
+</body>
+</html>
