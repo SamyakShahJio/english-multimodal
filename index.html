@@ -140,7 +140,7 @@ body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; a
 .m4-head span { font-size: 13px; font-weight: 700; color: var(--grey-60); }
 .correct-card { background: var(--grey-100); border-radius: var(--r-lg); padding: 20px; color: var(--white); }
 .cc-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--sparkle); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
-.corr-text { font-size: 18px; font-weight: 700; line-height: 1.4; }
+.cc-text { font-size: 18px; font-weight: 700; line-height: 1.4; }
 .fix-card { background: var(--white); border: 1.5px solid var(--grey-40); border-radius: var(--r-md); padding: 14px 16px; }
 .fix-wrong { font-size: 13px; color: var(--error); font-weight: 700; margin-bottom: 4px; }
 .fix-right { font-size: 13px; color: var(--success); font-weight: 700; margin-bottom: 8px; }
@@ -363,7 +363,7 @@ body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; a
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm5.21 7.71l-6 6a1 1 0 01-1.42 0l-3-3a1 1 0 111.42-1.42l2.29 2.3 5.29-5.3a1 1 0 011.42 1.42z"/></svg>
             Better way to say it
           </div>
-          <div class="corr-text">"Hi everyone, I'm Rahul. I've just joined the team today, and I'm really excited to be here."</div>
+          <div class="cc-text">"Hi everyone, I'm Rahul. I've just joined the team today, and I'm really excited to be here."</div>
         </div>
         <div class="fix-card">
           <div class="fix-wrong">&#10005; "I am working in this company from today"</div>
@@ -500,7 +500,7 @@ let ccEnabled = false;
 function unlockAudio() {
   try { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if (audioCtx.state === 'suspended') audioCtx.resume(); } catch(e) {}
 }
-function stopAudio() { if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; currentAudio = null; } speechSynthesis.cancel(); setVoiceActive(false); }
+function stopAudio() { if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; currentAudio = null; } speechSynthesis.cancel(); setVoiceActive(false); clearCC(); }
 
 function toggleCC() { ccEnabled = !ccEnabled; document.getElementById('ccBtn').classList.toggle('on', ccEnabled); if (!ccEnabled) clearCC(); }
 function setCC(text) { if (!ccEnabled) return; document.getElementById('ccText').textContent = text; document.getElementById('ccOverlay').classList.add('show'); }
