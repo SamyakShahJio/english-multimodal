@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>English Sathi — Multi-Modal Learning</title>
+<title>English Sathi — Mode 3: Voice + Text</title>
 <style>
 /* ===== FONTS ===== */
 @font-face { font-family: 'JioType'; font-weight: 400; font-display: swap; src: url('https://raw.githubusercontent.com/sunit1986/JioBharatIQ_Server/main/assets/fonts/woff2/JioTypeVarW05-Regular.woff2') format('woff2'); }
@@ -38,9 +38,12 @@ body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; a
 .back-btn { width: 36px; height: 36px; border-radius: 50%; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; color: inherit; transition: background 0.2s; flex-shrink: 0; }
 .back-btn:active { background: rgba(128,128,128,0.15); }
 .nav-title { font-size: 15px; font-weight: 700; }
+.mode-label { margin-left: auto; font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; padding: 3px 8px; border-radius: var(--r-pill); white-space: nowrap; }
+.nav-header.dark .mode-label { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.45); }
+.nav-header.light .mode-label { background: rgba(53,53,243,0.1); color: var(--primary); }
 
 /* ===== CC (Closed Captions) ===== */
-.cc-toggle { width: 36px; height: 28px; border-radius: var(--r-sm); border: 1.5px solid rgba(255,255,255,0.2); background: transparent; color: rgba(255,255,255,0.4); font-size: 10px; font-weight: 900; font-family: 'JioType'; cursor: pointer; transition: all 0.2s; flex-shrink: 0; letter-spacing: 0.5px; margin-left: auto; }
+.cc-toggle { width: 36px; height: 28px; border-radius: var(--r-sm); border: 1.5px solid rgba(255,255,255,0.2); background: transparent; color: rgba(255,255,255,0.4); font-size: 10px; font-weight: 900; font-family: 'JioType'; cursor: pointer; transition: all 0.2s; flex-shrink: 0; letter-spacing: 0.5px; }
 .cc-toggle.on { background: var(--white); color: var(--grey-100); border-color: var(--white); }
 .nav-header.light .cc-toggle { border-color: var(--grey-40); color: var(--grey-60); }
 .nav-header.light .cc-toggle.on { background: var(--grey-100); color: var(--white); border-color: var(--grey-100); }
@@ -252,6 +255,7 @@ body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; a
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19 11H7.83l4.88-4.88a1.008 1.008 0 00-1.42-1.42l-6.59 6.59a1 1 0 000 1.42l6.59 6.59a1.002 1.002 0 001.639-.325 1 1 0 00-.22-1.095L7.83 13H19a1 1 0 000-2z"/></svg>
       </button>
       <span class="nav-title">English Sathi</span>
+      <span class="mode-label">Mode 3 · Voice + Text</span>
       <button class="cc-toggle" id="ccBtn" onclick="toggleCC()">CC</button>
     </div>
 
