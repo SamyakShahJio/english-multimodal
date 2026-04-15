@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>English Sathi — Voice Only</title>
+<title>English Sathi — Voice First + Text Support</title>
 <style>
 /* ===== FONTS ===== */
 @font-face { font-family: 'JioType'; font-weight: 400; font-display: swap; src: url('https://raw.githubusercontent.com/sunit1986/JioBharatIQ_Server/main/assets/fonts/woff2/JioTypeVarW05-Regular.woff2') format('woff2'); }
@@ -31,7 +31,7 @@ body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; a
 .phone-frame { width: 360px; height: 800px; border-radius: 40px; overflow: hidden; position: relative; background: var(--grey-100); box-shadow: 0 0 0 2px rgba(0,0,0,0.08), 0 24px 80px rgba(0,0,0,0.15); flex-shrink: 0; }
 .screen { position: absolute; inset: 0; overflow: hidden; background: var(--dark-bg); }
 
-/* ===== NAV HEADER (always dark) ===== */
+/* ===== NAV HEADER ===== */
 .nav-header { position: absolute; top: 0; left: 0; right: 0; z-index: 150; display: flex; align-items: center; gap: 12px; padding: 14px 16px 8px; color: rgba(255,255,255,0.7); }
 .back-btn { width: 36px; height: 36px; border-radius: 50%; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; color: inherit; flex-shrink: 0; }
 .back-btn:active { background: rgba(128,128,128,0.15); }
@@ -44,21 +44,60 @@ body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; a
 .p-seg.done { background: var(--primary); }
 .p-seg.now { background: var(--primary); opacity: 0.65; }
 
-/* ===== VOICE MAIN ===== */
-.voice-main { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5; }
-.status-text { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.4); margin-bottom: 20px; min-height: 18px; transition: all 0.3s; }
-.avatar-vid { width: 160px; height: 160px; border-radius: 0; object-fit: cover; position: relative; z-index: 1; transition: opacity 0.2s ease; background: transparent; mix-blend-mode: screen; }
-
-/* ===== WAVE BARS (user speaking visualization) ===== */
-.wave-bars { display: flex; gap: 3px; align-items: center; height: 48px; margin-top: 16px; opacity: 0; transition: opacity 0.3s; }
+/* ===== VOICE MAIN (avatar area — upper half) ===== */
+.voice-main { position: absolute; top: 70px; left: 0; right: 0; height: 260px; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5; }
+.status-text { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.4); margin-bottom: 12px; min-height: 18px; transition: all 0.3s; }
+.avatar-vid { width: 140px; height: 140px; border-radius: 0; object-fit: cover; position: relative; z-index: 1; transition: opacity 0.2s ease; background: transparent; mix-blend-mode: screen; }
+.wave-bars { display: flex; gap: 3px; align-items: center; height: 48px; margin-top: 12px; opacity: 0; transition: opacity 0.3s; }
 .wave-bars.active { opacity: 1; }
 .wave-bars span { width: 4px; border-radius: 99px; background: var(--primary); height: 8px; }
 .wave-bars.active span { animation: waveBar 0.7s ease-in-out infinite; animation-delay: calc(var(--d) * 0.07s); }
 
+/* ===== CARD AREA (overlay cards below avatar) ===== */
+.card-area { position: absolute; top: 340px; bottom: 60px; left: 16px; right: 16px; z-index: 50; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+.card-area::-webkit-scrollbar { width: 0; }
+
+/* ===== OVERLAY CARDS (semi-transparent on dark bg) ===== */
+.overlay-card { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--r-lg); padding: 20px; color: var(--white); backdrop-filter: blur(8px); animation: cardIn 0.35s ease-out; }
+.overlay-card .sc-tag { display: inline-block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.8); background: rgba(53,53,243,0.25); padding: 4px 12px; border-radius: var(--r-pill); margin-bottom: 12px; }
+.overlay-card .sc-icon { width: 44px; height: 44px; border-radius: var(--r-md); background: var(--primary); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; color: var(--white); }
+.overlay-card .sc-en { font-size: 16px; font-weight: 900; line-height: 1.3; margin-bottom: 8px; text-align: center; }
+.overlay-card .sc-hint { display: flex; align-items: center; gap: 8px; font-size: 12px; color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.06); padding: 8px 12px; border-radius: var(--r-sm); text-align: left; }
+.overlay-card .sc-hint svg { flex-shrink: 0; color: var(--secondary); }
+
+.overlay-correction { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--r-lg); padding: 16px; color: var(--white); backdrop-filter: blur(8px); animation: cardIn 0.35s ease-out; }
+.overlay-correction .cc-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--sparkle); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+.overlay-correction .corr-text { font-size: 15px; font-weight: 700; line-height: 1.4; }
+
+.overlay-fix { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--r-md); padding: 12px 14px; color: var(--white); animation: cardIn 0.3s ease-out; }
+.overlay-fix .fix-wrong { font-size: 12px; color: rgba(250,47,64,0.85); font-weight: 700; margin-bottom: 3px; }
+.overlay-fix .fix-right { font-size: 12px; color: var(--sparkle); font-weight: 700; }
+.overlay-fix .fix-why { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 4px; line-height: 1.3; }
+
+.overlay-panel { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.06); border-radius: var(--r-md); padding: 14px 16px; color: var(--white); animation: cardIn 0.35s ease-out; }
+.overlay-panel .ct-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.3); margin-bottom: 8px; }
+.overlay-panel .ct-name { font-size: 11px; font-weight: 700; color: var(--sparkle); margin-bottom: 4px; }
+.overlay-panel .ct-text { font-size: 14px; line-height: 1.5; color: rgba(255,255,255,0.85); }
+.overlay-panel .ct-you { font-size: 11px; font-weight: 700; color: var(--secondary); margin-top: 10px; margin-bottom: 4px; }
+.overlay-panel .ct-user { font-size: 13px; color: rgba(255,255,255,0.5); font-style: italic; line-height: 1.4; }
+
+.overlay-fix-panel { background: rgba(255,255,255,0.04); border-left: 3px solid var(--secondary); border-radius: 4px var(--r-md) var(--r-md) 4px; padding: 12px 14px; color: var(--white); animation: cardIn 0.3s ease-out; }
+.overlay-fix-panel .fp-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--secondary); margin-bottom: 8px; }
+.overlay-fix-panel .fp-row { margin-bottom: 6px; }
+.overlay-fix-panel .fp-wrong { font-size: 12px; color: rgba(250,47,64,0.8); text-decoration: line-through; }
+.overlay-fix-panel .fp-right { font-size: 12px; color: var(--sparkle); font-weight: 700; margin-left: 6px; }
+.overlay-fix-panel .fp-why { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+
+/* ===== SKELETON (dark variant) ===== */
+.skeleton-dark { border-radius: var(--r-lg); background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+.skeleton-dark.skel-scenario { height: 150px; }
+.skeleton-dark.skel-correction { height: 70px; }
+.skeleton-dark.skel-fix { height: 48px; }
+
 /* ===== INTERRUPT BUTTON ===== */
 .interrupt-btn { position: absolute; bottom: 220px; left: 50%; transform: translateX(-50%); z-index: 200; padding: 8px 20px; border-radius: var(--r-pill); border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.6); font-size: 12px; font-weight: 700; font-family: 'JioType'; cursor: pointer; backdrop-filter: blur(8px); transition: all 0.2s; display: none; }
 .interrupt-btn.show { display: flex; align-items: center; gap: 6px; }
-.interrupt-btn:active { background: rgba(255,255,255,0.15); color: var(--white); }
+.interrupt-btn:active { background: rgba(255,255,255,0.15); }
 .interrupt-btn svg { width: 14px; height: 14px; }
 
 /* ===== AURORA ===== */
@@ -67,16 +106,14 @@ body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; a
 .ab1 { bottom: 100px; background: #3535f3; box-shadow: 0 0 80px 40px rgba(53,53,243,0.6), 0 0 160px 80px rgba(53,53,243,0.25); animation: abDrift1 5s ease-in-out infinite; }
 .ab2 { bottom: 110px; background: #6464ff; box-shadow: 0 0 60px 30px rgba(100,100,255,0.4), 0 0 120px 60px rgba(100,100,255,0.15); animation: abDrift2 7s ease-in-out infinite; }
 .ab3 { bottom: 90px; background: #1eccb0; box-shadow: 0 0 50px 25px rgba(30,204,176,0.3), 0 0 100px 50px rgba(30,204,176,0.1); animation: abDrift3 6s ease-in-out infinite; }
-/* Speaking state — bright, fast */
 .aurora.speaking .ab1 { animation-duration: 2.5s; box-shadow: 0 0 100px 50px rgba(53,53,243,0.8), 0 0 200px 100px rgba(53,53,243,0.35); }
 .aurora.speaking .ab2 { animation-duration: 3.5s; box-shadow: 0 0 80px 40px rgba(100,100,255,0.6), 0 0 160px 80px rgba(100,100,255,0.25); }
 .aurora.speaking .ab3 { animation-duration: 3s; box-shadow: 0 0 70px 35px rgba(30,204,176,0.45), 0 0 140px 70px rgba(30,204,176,0.15); }
-/* Thinking state — slow, warm, dimmer */
 .aurora.thinking .ab1 { animation-duration: 8s; box-shadow: 0 0 60px 30px rgba(247,171,32,0.4), 0 0 120px 60px rgba(247,171,32,0.15); }
 .aurora.thinking .ab2 { animation-duration: 10s; box-shadow: 0 0 50px 25px rgba(100,100,255,0.25), 0 0 100px 50px rgba(100,100,255,0.1); }
 .aurora.thinking .ab3 { animation-duration: 9s; box-shadow: 0 0 40px 20px rgba(30,204,176,0.2), 0 0 80px 40px rgba(30,204,176,0.08); }
 
-/* ===== CC OVERLAY (always on, streaming) ===== */
+/* ===== CC OVERLAY ===== */
 .cc-overlay { position: absolute; bottom: 44px; left: 16px; right: 16px; z-index: 200; text-align: center; pointer-events: none; opacity: 0; transition: opacity 0.3s; }
 .cc-overlay.show { opacity: 1; }
 .cc-text { display: inline-block; background: rgba(0,0,0,0.75); color: var(--white); font-size: 14px; line-height: 1.5; padding: 8px 16px; border-radius: var(--r-md); max-width: 100%; backdrop-filter: blur(8px); }
@@ -86,20 +123,19 @@ body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; a
 .voice-strip.active { opacity: 1; }
 .voice-strip span { width: 2.5px; border-radius: 99px; height: 4px; background: rgba(255,255,255,0.4); }
 .voice-strip.active span { animation: vsBar 0.7s ease-in-out infinite; animation-delay: calc(var(--d) * 0.04s); }
-/* Processing state — half speed, dimmer */
 .voice-strip.processing { opacity: 0.6; }
 .voice-strip.processing span { animation: vsBar 1.4s ease-in-out infinite; animation-delay: calc(var(--d) * 0.08s); }
 
-/* ===== CALL HEADER (M5) ===== */
-.call-header { position: absolute; top: 80px; left: 0; right: 0; z-index: 20; text-align: center; color: var(--white); opacity: 0; transition: opacity 0.4s; pointer-events: none; }
+/* ===== CALL HEADER ===== */
+.call-header { position: absolute; top: 70px; left: 0; right: 0; z-index: 20; text-align: center; color: var(--white); opacity: 0; transition: opacity 0.4s; pointer-events: none; }
 .call-header.show { opacity: 1; }
-.call-av-small { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-light), var(--primary)); display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 900; color: var(--white); margin: 0 auto 8px; position: relative; }
-.call-av-ring { position: absolute; inset: -5px; border-radius: 50%; border: 2px solid rgba(53,53,243,0.4); animation: ringPulse 2s ease-in-out infinite; }
-.call-name { font-size: 18px; font-weight: 900; }
-.call-role { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.35); font-weight: 700; margin-top: 2px; }
-.call-stat { font-size: 12px; color: var(--sparkle); font-weight: 700; margin-top: 8px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.call-av-small { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-light), var(--primary)); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 900; color: var(--white); margin: 0 auto 6px; position: relative; }
+.call-av-ring { position: absolute; inset: -4px; border-radius: 50%; border: 2px solid rgba(53,53,243,0.4); animation: ringPulse 2s ease-in-out infinite; }
+.call-name { font-size: 16px; font-weight: 900; }
+.call-role { font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.35); font-weight: 700; }
+.call-stat { font-size: 11px; color: var(--sparkle); font-weight: 700; margin-top: 6px; display: flex; align-items: center; justify-content: center; gap: 6px; }
 .dot-pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--sparkle); animation: dotPulse 1.5s infinite; display: inline-block; }
-.call-time { font-size: 11px; color: rgba(255,255,255,0.2); font-variant-numeric: tabular-nums; margin-top: 3px; }
+.call-time { font-size: 10px; color: rgba(255,255,255,0.2); font-variant-numeric: tabular-nums; margin-top: 2px; }
 
 /* ===== SUMMARY OVERLAY ===== */
 .summary-overlay { position: absolute; inset: 0; z-index: 300; background: var(--dark-bg); display: flex; flex-direction: column; opacity: 0; pointer-events: none; transition: opacity 0.4s; }
@@ -127,7 +163,6 @@ body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; a
 .btn-fill { flex: 1; padding: 14px; border-radius: var(--r-pill); border: none; background: var(--primary); color: var(--white); font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'JioType'; }
 .btn-fill:active { opacity: 0.85; }
 .btn-ghost-dark { flex: 1; padding: 14px; border-radius: var(--r-pill); border: 1.5px solid rgba(255,255,255,0.2); background: transparent; color: rgba(255,255,255,0.7); font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'JioType'; }
-.btn-ghost-dark:active { background: rgba(255,255,255,0.05); }
 
 /* ===== ANIMATIONS ===== */
 @keyframes abDrift1 { 0%, 100% { transform: translateX(0) scaleX(1); opacity: 0.8; } 50% { transform: translateX(3%) scaleX(1.05); opacity: 1; } }
@@ -137,8 +172,9 @@ body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; a
 @keyframes waveBar { 0%, 100% { height: 8px; opacity: 0.3; } 50% { height: 36px; opacity: 1; } }
 @keyframes ringPulse { 0%, 100% { opacity: 0.4; transform: scale(1); } 50% { opacity: 0.8; transform: scale(1.06); } }
 @keyframes dotPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+@keyframes cardIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
-/* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
   body { background: #000 !important; padding: 0 !important; }
   .phone-frame { width: 100% !important; height: 100vh !important; height: 100dvh !important; border-radius: 0 !important; box-shadow: none !important; max-width: 100% !important; }
@@ -149,22 +185,18 @@ body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; a
 
 <div class="phone-frame">
   <div class="screen">
-
-    <!-- Nav Header -->
     <div class="nav-header">
       <button class="back-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19 11H7.83l4.88-4.88a1.008 1.008 0 00-1.42-1.42l-6.59 6.59a1 1 0 000 1.42l6.59 6.59a1.002 1.002 0 001.639-.325 1 1 0 00-.22-1.095L7.83 13H19a1 1 0 000-2z"/></svg></button>
       <span class="nav-title">English Sathi</span>
-      <span class="mode-label">Voice Only</span>
+      <span class="mode-label">Voice First</span>
     </div>
 
-    <!-- Progress -->
     <div class="progress" id="progress">
       <div class="p-seg now"></div><div class="p-seg"></div><div class="p-seg"></div>
       <div class="p-seg"></div><div class="p-seg"></div><div class="p-seg"></div>
     </div>
 
-    <!-- Voice Main -->
-    <div class="voice-main">
+    <div class="voice-main" id="voiceMain">
       <div class="status-text" id="statusText"></div>
       <video id="avatarVid" class="avatar-vid" autoplay loop muted playsinline></video>
       <div class="wave-bars" id="waveBars">
@@ -175,13 +207,13 @@ body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; a
       </div>
     </div>
 
-    <!-- Interrupt Button -->
+    <div class="card-area" id="cardArea"></div>
+
     <button class="interrupt-btn" id="interruptBtn" onclick="onInterrupt()">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
       Cut in
     </button>
 
-    <!-- Call Header (M5) -->
     <div class="call-header" id="callHeader">
       <div class="call-av-small"><div class="call-av-ring"></div>P</div>
       <div class="call-name">Priya</div>
@@ -190,19 +222,14 @@ body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; a
       <div class="call-time" id="callTime">00:00</div>
     </div>
 
-    <!-- Aurora -->
     <div class="aurora" id="aurora">
       <div class="aurora-band ab1"></div>
       <div class="aurora-band ab2"></div>
       <div class="aurora-band ab3"></div>
     </div>
 
-    <!-- CC Overlay (always on) -->
-    <div class="cc-overlay" id="ccOverlay">
-      <div class="cc-text" id="ccText"></div>
-    </div>
+    <div class="cc-overlay" id="ccOverlay"><div class="cc-text" id="ccText"></div></div>
 
-    <!-- Voice Strip -->
     <div class="voice-strip" id="voiceStrip">
       <span style="--d:0"></span><span style="--d:1"></span><span style="--d:2"></span>
       <span style="--d:3"></span><span style="--d:4"></span><span style="--d:5"></span>
@@ -214,7 +241,6 @@ body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; a
       <span style="--d:21"></span><span style="--d:22"></span><span style="--d:23"></span>
     </div>
 
-    <!-- Summary Overlay (M6) -->
     <div class="summary-overlay" id="summaryOverlay">
       <div class="sum-scroll">
         <div class="sum-hero">
@@ -247,7 +273,6 @@ body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; a
         </div>
       </div>
     </div>
-
   </div>
 </div>
 
@@ -256,7 +281,6 @@ body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; a
 const API_KEY = 'sk_86a2daf2318ba84afa5190ff9a2c09fcc9e7f9dafea1fe79';
 const VOICE_ID = 'FaqthkZu1EWxXxUFbAfb';
 const TTS_URL = `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`;
-
 const AV = {
   idle:  'https://raw.githubusercontent.com/sunit1986/JioBharatIQ_Server/main/assets/states/Dark/HelloJio_Breath(IdleState)_242.mp4',
   speak: 'https://raw.githubusercontent.com/sunit1986/JioBharatIQ_Server/main/assets/states/Dark/HelloJio_BotSpeaking_242.mp4',
@@ -265,331 +289,235 @@ const AV = {
 
 // ===== CONTENT =====
 const V = {
-  m1: "Namaste! Main tumhara English learning saathi hoon. Aaj hum ek situation ke liye practice karenge. Socho ki tum ek new office mein apna introduction de rahe ho.",
-  m2: "Imagine you have just joined a new company. Your manager asks you to introduce yourself to the team. Think about your name, your role, and why you are excited. Try saying it in English.",
+  m1: "Namaste! Main tumhara English learning saathi hoon. Aaj hum ek situation ke liye practice karenge.",
+  m2: "Imagine you have just joined a new company. Your manager asks you to introduce yourself to the team. Think about your name, your role, and why you are excited.",
   m4: "Great attempt! Here is a more natural way to say it. Hi everyone, I am Rahul. I have just joined the team today, and I am really excited to be here.",
   m4fixes: "Two quick fixes. Instead of I am working in this company from today, say I have just joined the team today. And instead of I am very happy for joining, say I am really excited to be here.",
   m5r1: "Now let us practice! I will be your colleague Priya. Hey Rahul, nice to meet you! So what were you doing before joining us?",
-  m5c1: "Good! Small fix. Say, I was working at an IT company in Pune, instead of doing job in Pune. Working at sounds much more professional.",
+  m5c1: "Good! Small fix. Say, I was working at an IT company in Pune, instead of doing job in Pune.",
   m5r2: "That sounds interesting! What kind of projects were you working on there?",
   m5c2: "Nice! Say developing software, not making software. And it is very interesting, not very much interesting.",
   m5r3: "Great! What are you most looking forward to in this new role?",
-  m5c3: "Almost perfect! Say looking forward to, not looking forward for. And remember, people is already plural. You do not need to add an S.",
-  m6: "Bahut achha, Rahul! Aaj tumne teen important cheezein seekhi. Pehli, I have just joined use karo recent actions ke liye. Doosri, working at bolo, doing job nahi. Aur teesri, people already plural hai. Keep practicing!"
+  m5c3: "Almost perfect! Say looking forward to, not looking forward for. And people is already plural.",
+  m6: "Bahut achha, Rahul! Aaj tumne teen important cheezein seekhi. Keep practicing!"
 };
-
-const FILLERS = [
-  "Ek second, checking kar raha hoon...",
-  "Hmm, soch raha hoon...",
-  "Achha, dekhte hain..."
-];
-
+const FILLERS = ["Ek second, checking kar raha hoon...", "Hmm, soch raha hoon...", "Achha, dekhte hain..."];
 const U = {
   m3: "Hello, I am Rahul. I am working in this company from today. I am very happy for joining.",
   r1: "Before this I was doing job in Pune in a IT company.",
   r2: "I was making software for banks. It was very much interesting work.",
   r3: "I am looking forward for learning new things and meeting good peoples."
 };
-
 const ROUNDS = [
-  { aiVoice: V.m5r1, corrVoice: V.m5c1, userText: U.r1 },
-  { aiVoice: V.m5r2, corrVoice: V.m5c2, userText: U.r2 },
-  { aiVoice: V.m5r3, corrVoice: V.m5c3, userText: U.r3 }
+  { aiVoice: V.m5r1, corrVoice: V.m5c1, userText: U.r1, aiText: "Hey Rahul, nice to meet you! So what were you doing before joining us?",
+    fixes: [{ w: '"doing job in Pune"', r: '"working at a company"', why: '"Working at" is standard' }, { w: '"a IT company"', r: '"an IT company"', why: 'Use "an" before vowel sounds' }] },
+  { aiVoice: V.m5r2, corrVoice: V.m5c2, userText: U.r2, aiText: "What kind of projects were you working on there?",
+    fixes: [{ w: '"making software"', r: '"developing software"', why: '"Develop" is professional' }, { w: '"very much interesting"', r: '"very interesting"', why: 'No "much" needed' }] },
+  { aiVoice: V.m5r3, corrVoice: V.m5c3, userText: U.r3, aiText: "What are you most looking forward to in this new role?",
+    fixes: [{ w: '"looking forward for"', r: '"looking forward to"', why: '"Look forward to" + gerund' }, { w: '"good peoples"', r: '"great people"', why: '"People" is already plural' }] }
 ];
 
 // ===== AUDIO ENGINE =====
-const ttsCache = new Map();
-let currentAudio = null;
-let audioCtx = null;
-
+const ttsCache = new Map(); let currentAudio = null; let audioCtx = null;
 function unlockAudio() { try { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if (audioCtx.state === 'suspended') audioCtx.resume(); } catch(e) {} }
-
-function stopAudio() {
-  if (currentAudio) {
-    const resolve = currentAudio._resolve;
-    currentAudio.pause(); currentAudio.currentTime = 0; currentAudio = null;
-    if (resolve) resolve(); // resolve pending speak() promise
-  }
-  speechSynthesis.cancel();
-  setVoiceActive(false);
-}
-
-function speak(text, pace) {
-  pace = pace || 1.0;
-  return new Promise(async (resolve) => {
-    unlockAudio(); stopAudio();
-    const key = text + '|' + pace;
-    if (ttsCache.has(key)) { playUrl(ttsCache.get(key), resolve); return; }
-    try {
-      const res = await fetch(TTS_URL, { method: 'POST', headers: { 'xi-api-key': API_KEY, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, model_id: 'eleven_turbo_v2_5', voice_settings: { stability: 0.5, similarity_boost: 0.75, speed: pace } }) });
-      if (!res.ok) throw new Error('TTS ' + res.status);
-      const blob = await res.blob(); const url = URL.createObjectURL(blob); ttsCache.set(key, url); playUrl(url, resolve);
-    } catch(e) { console.warn('TTS fallback:', e); setVoiceActive(true); browserTTS(text, pace < 0.8 ? 0.65 : 0.85); const dur = Math.min(text.length * 65, 8000); setTimeout(() => { setVoiceActive(false); resolve(); }, dur); }
-  });
-}
-
-function playUrl(url, onend) {
-  const a = new Audio(url); currentAudio = a; a._resolve = onend;
-  setVoiceActive(true);
+function stopAudio() { if (currentAudio) { const r = currentAudio._resolve; currentAudio.pause(); currentAudio.currentTime = 0; currentAudio = null; if (r) r(); } speechSynthesis.cancel(); setVoiceActive(false); }
+function speak(text, pace) { pace = pace || 1.0; return new Promise(async (resolve) => { unlockAudio(); stopAudio(); const key = text + '|' + pace;
+  if (ttsCache.has(key)) { playUrl(ttsCache.get(key), resolve); return; }
+  try { const res = await fetch(TTS_URL, { method: 'POST', headers: { 'xi-api-key': API_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text, model_id: 'eleven_turbo_v2_5', voice_settings: { stability: 0.5, similarity_boost: 0.75, speed: pace } }) });
+    if (!res.ok) throw new Error('TTS'); const blob = await res.blob(); const url = URL.createObjectURL(blob); ttsCache.set(key, url); playUrl(url, resolve);
+  } catch(e) { setVoiceActive(true); browserTTS(text, 0.85); setTimeout(() => { setVoiceActive(false); resolve(); }, Math.min(text.length * 65, 8000)); } }); }
+function playUrl(url, onend) { const a = new Audio(url); currentAudio = a; a._resolve = onend; setVoiceActive(true);
   a.onended = () => { setVoiceActive(false); currentAudio = null; if (onend) onend(); };
   a.onerror = () => { setVoiceActive(false); currentAudio = null; if (onend) onend(); };
-  a.play().catch(() => { setVoiceActive(false); currentAudio = null; if (onend) setTimeout(onend, 500); });
-}
-
+  a.play().catch(() => { setVoiceActive(false); currentAudio = null; if (onend) setTimeout(onend, 500); }); }
 function browserTTS(text, rate) { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text); u.lang = 'en-US'; u.rate = rate || 0.85; speechSynthesis.speak(u); }
-
-function preCache(text, pace) {
-  pace = pace || 1.0; const key = text + '|' + pace; if (ttsCache.has(key)) return;
+function preCache(text, pace) { pace = pace || 1.0; const key = text + '|' + pace; if (ttsCache.has(key)) return;
   fetch(TTS_URL, { method: 'POST', headers: { 'xi-api-key': API_KEY, 'Content-Type': 'application/json' },
     body: JSON.stringify({ text, model_id: 'eleven_turbo_v2_5', voice_settings: { stability: 0.5, similarity_boost: 0.75, speed: pace } })
-  }).then(r => r.blob()).then(b => { ttsCache.set(key, URL.createObjectURL(b)); }).catch(() => {});
-}
+  }).then(r => r.blob()).then(b => { ttsCache.set(key, URL.createObjectURL(b)); }).catch(() => {}); }
 
-// ===== STREAMING CC ENGINE =====
+// ===== STREAMING CC =====
 let ccTimer = null;
-
-function streamCC(text, msPerWord) {
-  msPerWord = msPerWord || 120;
-  clearCCStream();
-  const words = text.split(/\s+/);
-  const el = $('ccText');
-  el.textContent = '';
-  $('ccOverlay').classList.add('show');
-  let i = 0;
-  return new Promise(resolve => {
-    ccTimer = setInterval(() => {
-      if (i >= words.length) { clearInterval(ccTimer); ccTimer = null; resolve(); return; }
-      el.textContent += (i > 0 ? ' ' : '') + words[i];
-      i++;
-    }, msPerWord);
-  });
-}
-
+function streamCC(text, ms) { ms = ms || 120; clearCCStream(); const words = text.split(/\s+/); const el = $('ccText'); el.textContent = ''; $('ccOverlay').classList.add('show'); let i = 0;
+  return new Promise(resolve => { ccTimer = setInterval(() => { if (i >= words.length) { clearInterval(ccTimer); ccTimer = null; resolve(); return; } el.textContent += (i > 0 ? ' ' : '') + words[i]; i++; }, ms); }); }
 function clearCCStream() { if (ccTimer) { clearInterval(ccTimer); ccTimer = null; } }
 function clearCC() { clearCCStream(); $('ccOverlay').classList.remove('show'); $('ccText').textContent = ''; }
 
 // ===== AVATAR =====
-function setAvatar(state) {
-  const vid = $('avatarVid');
-  if (!vid || vid.dataset.av === state) return;
-  vid.dataset.av = state; vid.style.opacity = '0';
-  setTimeout(() => { vid.src = AV[state]; vid.load(); vid.play().catch(()=>{}); vid.style.opacity = '1'; }, 150);
-}
+function setAvatar(state) { const vid = $('avatarVid'); if (!vid || vid.dataset.av === state) return; vid.dataset.av = state; vid.style.opacity = '0';
+  setTimeout(() => { vid.src = AV[state]; vid.load(); vid.play().catch(()=>{}); vid.style.opacity = '1'; }, 150); }
 
 // ===== VOICE STATE =====
-function setVoiceActive(on) {
-  $('voiceStrip').classList.toggle('active', on);
-  $('aurora').classList.toggle('speaking', on);
-  if (!on) $('aurora').classList.remove('speaking');
-}
+function setVoiceActive(on) { $('voiceStrip').classList.toggle('active', on); $('aurora').classList.toggle('speaking', on); if (!on) $('aurora').classList.remove('speaking'); }
+function setThinking(on) { $('aurora').classList.toggle('thinking', on); $('voiceStrip').classList.toggle('active', on); $('voiceStrip').classList.toggle('processing', on); }
+function playReadyChime() { try { const ctx = new (window.AudioContext || window.webkitAudioContext)(); const osc = ctx.createOscillator(); const g = ctx.createGain(); osc.connect(g); g.connect(ctx.destination); osc.frequency.value = 880; osc.type = 'sine'; g.gain.value = 0.08; g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3); osc.start(); osc.stop(ctx.currentTime + 0.3); } catch(e) {} }
 
-function setThinking(on) {
-  $('aurora').classList.toggle('thinking', on);
-  $('voiceStrip').classList.toggle('active', on);
-  $('voiceStrip').classList.toggle('processing', on);
-}
-
-// ===== READY CHIME =====
-function playReadyChime() {
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = ctx.createOscillator(); const gain = ctx.createGain();
-    osc.connect(gain); gain.connect(ctx.destination);
-    osc.frequency.value = 880; osc.type = 'sine';
-    gain.gain.value = 0.08;
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
-    osc.start(); osc.stop(ctx.currentTime + 0.3);
-  } catch(e) {}
-}
-
-// ===== INTERRUPT =====
+// ===== INTERRUPT + AUTO-LISTEN =====
 function showInterrupt() { $('interruptBtn').classList.add('show'); }
 function hideInterrupt() { $('interruptBtn').classList.remove('show'); }
 function onInterrupt() { stopAudio(); clearCC(); hideInterrupt(); }
 
-// ===== AUTO-LISTEN (STT SIMULATION) =====
 async function autoListen(userText) {
-  const g = gen;
-  setStatus('Listening...');
-  setAvatar('listen');
-  await wait(800);
-  if (g !== gen) return;
-  // Simulate user speaking: wave bars + streaming CC of their words
-  $('waveBars').classList.add('active');
-  setStatus('');
-  await streamCC(userText, 150); // slower pace for STT feel
+  const g = gen; setStatus('Listening...'); setAvatar('listen');
+  await wait(800); if (g !== gen) return;
+  $('waveBars').classList.add('active'); setStatus('');
+  await streamCC(userText, 150);
   if (g !== gen) return;
   $('waveBars').classList.remove('active');
-  await wait(500);
-  if (g !== gen) return;
-  clearCC();
+  await wait(500); if (g !== gen) return; clearCC();
 }
 
-// ===== LATENCY MARKERS =====
-async function showThinkingMarkers(contextLabel) {
-  const g = gen;
-  setStatus(contextLabel || 'Thinking...');
-  setThinking(true);
-  // Spoken filler
+async function showThinkingMarkers(label) {
+  const g = gen; setStatus(label || 'Thinking...'); setThinking(true);
   const filler = FILLERS[Math.floor(Math.random() * FILLERS.length)];
-  streamCC(filler);
-  setAvatar('speak');
+  streamCC(filler); setAvatar('speak');
   await speak(filler, 1.1);
-  if (g !== gen) return;
-  clearCC();
-  setAvatar('idle');
-  await wait(300);
-  if (g !== gen) return;
-  playReadyChime();
-  setThinking(false);
-  setStatus('');
+  if (g !== gen) return; clearCC(); setAvatar('idle');
+  await wait(300); if (g !== gen) return;
+  playReadyChime(); setThinking(false); setStatus('');
 }
 
-// ===== STATE MACHINE =====
+// ===== CARD MANAGEMENT =====
+function clearCards() { $('cardArea').innerHTML = ''; }
+function addCard(html) { const t = document.createElement('template'); t.innerHTML = html.trim(); const el = t.content.firstChild; $('cardArea').appendChild(el); $('cardArea').scrollTop = $('cardArea').scrollHeight; return el; }
+function showCardSkeleton(type) { const el = document.createElement('div'); el.className = 'skeleton-dark skel-' + type; $('cardArea').appendChild(el); return el; }
+function replaceCardSkeleton(skel, html) { const t = document.createElement('template'); t.innerHTML = html.trim(); skel.replaceWith(t.content.firstChild); }
+
+// ===== STATE =====
 let gen = 0; let sessionStart = 0; let callTimerInt = null; let callSecs = 0;
 const $ = id => document.getElementById(id);
 function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
 function setStatus(text) { $('statusText').textContent = text; }
 function updateProgress(n) { document.querySelectorAll('.p-seg').forEach((s, i) => { s.classList.toggle('done', i < n - 1); s.classList.toggle('now', i === n - 1); }); }
 
-// ===== MOMENT 1 — GREETING =====
+// ===== M1 — GREETING (voice-only, no cards) =====
 async function playM1() {
   const g = gen; sessionStart = Date.now(); updateProgress(1);
-  setStatus(''); setAvatar('speak');
+  setStatus(''); setAvatar('speak'); clearCards();
+  $('voiceMain').style.display = 'flex';
+  $('callHeader').classList.remove('show');
   preCache(V.m2); preCache(V.m4);
-  // Voice + streaming CC in parallel
-  showInterrupt();
-  streamCC(V.m1);
-  await speak(V.m1);
-  hideInterrupt(); clearCC();
-  if (g !== gen) return;
-  setAvatar('idle');
-  await wait(600);
-  if (g !== gen) return;
+  showInterrupt(); streamCC(V.m1); await speak(V.m1);
+  hideInterrupt(); clearCC(); if (g !== gen) return;
+  setAvatar('idle'); await wait(600); if (g !== gen) return;
   playM2();
 }
 
-// ===== MOMENT 2 — SCENARIO =====
+// ===== M2 — SCENARIO (voice + overlay scenario card) =====
 async function playM2() {
   const g = gen; updateProgress(2);
   setStatus('Scenario'); setAvatar('speak');
   preCache(V.m4fixes);
-  showInterrupt();
-  streamCC(V.m2);
-  await speak(V.m2);
-  hideInterrupt(); clearCC();
-  if (g !== gen) return;
-  setAvatar('listen');
-  setStatus('');
-  await wait(500);
-  if (g !== gen) return;
+  // Show skeleton card, then replace with real during voice
+  const skel = showCardSkeleton('scenario');
+  showInterrupt(); streamCC(V.m2); await speak(V.m2);
+  hideInterrupt(); clearCC(); if (g !== gen) return;
+  replaceCardSkeleton(skel, '<div class="overlay-card"><div class="sc-tag">OFFICE &middot; FORMAL</div><div class="sc-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M20 7h-4V5c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zM10 5h4v2h-4V5z"/></svg></div><div class="sc-en">Introduce yourself to your new team</div><div class="sc-hint"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/></svg><span>Your name, role, and why you\'re excited</span></div></div>');
+  setAvatar('listen'); setStatus('');
+  await wait(500); if (g !== gen) return;
   playM3();
 }
 
-// ===== MOMENT 3 — USER SPEAKS (auto-listen) =====
+// ===== M3 — USER SPEAKS =====
 async function playM3() {
-  const g = gen; updateProgress(3);
+  const g = gen; updateProgress(3); clearCards();
   await autoListen(U.m3);
   if (g !== gen) return;
-  // Thinking markers before correction
   await showThinkingMarkers('Checking grammar...');
   if (g !== gen) return;
   playM4();
 }
 
-// ===== MOMENT 4 — CORRECTION =====
+// ===== M4 — CORRECTION (voice + overlay cards) =====
 async function playM4() {
   const g = gen; updateProgress(4);
   setStatus('Coach feedback'); setAvatar('speak');
-  preCache(V.m5r1); preCache(V.m5c1); preCache(V.m5r2);
-  showInterrupt();
-  streamCC(V.m4);
-  await speak(V.m4);
-  if (g !== gen) return;
-  clearCC();
-  streamCC(V.m4fixes);
-  await speak(V.m4fixes);
-  hideInterrupt(); clearCC();
-  if (g !== gen) return;
+  preCache(V.m5r1); preCache(V.m5c1);
+  // Correction card skeleton
+  const skel = showCardSkeleton('correction');
+  showInterrupt(); streamCC(V.m4); await speak(V.m4);
+  if (g !== gen) return; clearCC();
+  replaceCardSkeleton(skel, '<div class="overlay-correction"><div class="cc-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm5.21 7.71l-6 6a1 1 0 01-1.42 0l-3-3a1 1 0 111.42-1.42l2.29 2.3 5.29-5.3a1 1 0 011.42 1.42z"/></svg> Better way to say it</div><div class="corr-text">\u201CHi everyone, I\u2019m Rahul. I\u2019ve just joined the team today, and I\u2019m really excited to be here.\u201D</div></div>');
+  // Fix cards
+  streamCC(V.m4fixes); await speak(V.m4fixes);
+  hideInterrupt(); clearCC(); if (g !== gen) return;
+  addCard('<div class="overlay-fix"><div class="fix-wrong">\u2715 "I am working in this company from today"</div><div class="fix-right">\u2713 "I\u2019ve just joined the team today"</div></div>');
+  await wait(300);
+  addCard('<div class="overlay-fix"><div class="fix-wrong">\u2715 "I am very happy for joining"</div><div class="fix-right">\u2713 "I\u2019m really excited to be here"</div></div>');
   setAvatar('idle'); setStatus('');
-  await wait(800);
-  if (g !== gen) return;
+  await wait(1000); if (g !== gen) return;
   playM5();
 }
 
-// ===== MOMENT 5 — PRACTICE CALL =====
+// ===== M5 — PRACTICE CALL =====
 async function playM5() {
   const g = gen; updateProgress(5);
-  showCallHeader(); startCallTimer();
+  clearCards(); $('voiceMain').style.display = 'none';
+  $('callHeader').classList.add('show'); startCallTimer();
   preCache(V.m5c2); preCache(V.m5r3); preCache(V.m5c3); preCache(V.m6);
   FILLERS.forEach(f => preCache(f, 1.1));
   $('callStat').innerHTML = '<span class="dot-pulse"></span> Connecting...';
-  await wait(800);
-  if (g !== gen) return;
+  await wait(800); if (g !== gen) return;
 
   for (let i = 0; i < ROUNDS.length; i++) {
     const round = ROUNDS[i];
-    // Priya speaks
-    $('callStat').innerHTML = '<span class="dot-pulse"></span> Priya is speaking...';
+    // Priya speaks + transcript overlay
+    $('callStat').innerHTML = '<span class="dot-pulse"></span> Priya speaking...';
     setAvatar('speak');
-    showInterrupt();
-    streamCC(round.aiVoice);
-    await speak(round.aiVoice);
-    hideInterrupt(); clearCC();
-    if (g !== gen) return;
-    // User's turn (auto-listen)
+    addCard('<div class="overlay-panel"><div class="ct-label">Live Transcript</div><div class="ct-name">Priya</div><div class="ct-text">' + round.aiText + '</div></div>');
+    showInterrupt(); streamCC(round.aiVoice); await speak(round.aiVoice);
+    hideInterrupt(); clearCC(); if (g !== gen) return;
+    // User turn
     $('callStat').innerHTML = '<span class="dot-pulse" style="background:var(--white)"></span> Your turn';
     await autoListen(round.userText);
     if (g !== gen) return;
+    // Add user text to last panel
+    const panels = $('cardArea').querySelectorAll('.overlay-panel');
+    const last = panels[panels.length - 1];
+    if (last) last.insertAdjacentHTML('beforeend', '<div class="ct-you">You said:</div><div class="ct-user">\u201C' + round.userText + '\u201D</div>');
     // Thinking + correction
     $('callStat').innerHTML = '<span class="dot-pulse" style="background:var(--secondary)"></span> Processing...';
     await showThinkingMarkers('Processing...');
     if (g !== gen) return;
+    // Fix panel overlay
+    let fhtml = '<div class="overlay-fix-panel"><div class="fp-label">Quick Fix</div>';
+    round.fixes.forEach(f => { fhtml += '<div class="fp-row"><span class="fp-wrong">' + f.w + '</span><span class="fp-right">' + f.r + '</span><div class="fp-why">' + f.why + '</div></div>'; });
+    fhtml += '</div>';
+    addCard(fhtml);
     $('callStat').innerHTML = '<span class="dot-pulse"></span> Coach speaking...';
     setAvatar('speak');
-    showInterrupt();
-    streamCC(round.corrVoice);
-    await speak(round.corrVoice);
-    hideInterrupt(); clearCC();
-    if (g !== gen) return;
+    showInterrupt(); streamCC(round.corrVoice); await speak(round.corrVoice);
+    hideInterrupt(); clearCC(); if (g !== gen) return;
     if (i < ROUNDS.length - 1) await wait(600);
   }
 
   stopCallTimer();
   $('callStat').innerHTML = '<span class="dot-pulse" style="background:var(--secondary)"></span> Call ended';
   setAvatar('idle');
-  await wait(1500);
-  if (g !== gen) return;
+  await wait(1500); if (g !== gen) return;
   playM6();
 }
 
-function showCallHeader() { $('callHeader').classList.add('show'); }
-function hideCallHeader() { $('callHeader').classList.remove('show'); }
-function startCallTimer() { callSecs = 0; if (callTimerInt) clearInterval(callTimerInt);
-  callTimerInt = setInterval(() => { callSecs++; const m = String(Math.floor(callSecs/60)).padStart(2,'0'); const s = String(callSecs%60).padStart(2,'0'); $('callTime').textContent = m+':'+s; }, 1000); }
+function startCallTimer() { callSecs = 0; if (callTimerInt) clearInterval(callTimerInt); callTimerInt = setInterval(() => { callSecs++; $('callTime').textContent = String(Math.floor(callSecs/60)).padStart(2,'0') + ':' + String(callSecs%60).padStart(2,'0'); }, 1000); }
 function stopCallTimer() { if (callTimerInt) { clearInterval(callTimerInt); callTimerInt = null; } }
 
-// ===== MOMENT 6 — SUMMARY =====
+// ===== M6 — SUMMARY =====
 async function playM6() {
   const g = gen; updateProgress(6);
-  hideCallHeader();
+  $('callHeader').classList.remove('show');
   const elapsed = Math.floor((Date.now() - sessionStart) / 1000);
   $('sumTime').textContent = Math.floor(elapsed/60) + ':' + String(elapsed%60).padStart(2,'0');
   $('summaryOverlay').classList.add('active');
-  setAvatar('speak');
-  streamCC(V.m6);
-  await speak(V.m6);
-  clearCC();
-  if (g !== gen) return;
-  setAvatar('idle');
+  setAvatar('speak'); streamCC(V.m6); await speak(V.m6); clearCC();
+  if (g !== gen) return; setAvatar('idle');
 }
 
 // ===== RESTART =====
 function restart() {
-  gen++; stopAudio(); clearCC(); stopCallTimer(); hideInterrupt(); hideCallHeader();
-  $('waveBars').classList.remove('active');
-  $('summaryOverlay').classList.remove('active');
+  gen++; stopAudio(); clearCC(); stopCallTimer(); hideInterrupt(); clearCards();
+  $('callHeader').classList.remove('show'); $('summaryOverlay').classList.remove('active');
+  $('voiceMain').style.display = 'flex'; $('waveBars').classList.remove('active');
   setThinking(false); setStatus('');
   playM1();
 }
@@ -597,8 +525,7 @@ function restart() {
 // ===== INIT =====
 document.addEventListener('click', unlockAudio, { once: true });
 document.addEventListener('touchstart', unlockAudio, { once: true });
-preCache(V.m1); preCache(V.m2);
-FILLERS.forEach(f => preCache(f, 1.1));
+preCache(V.m1); preCache(V.m2); FILLERS.forEach(f => preCache(f, 1.1));
 [AV.idle, AV.speak, AV.listen].forEach(url => { const v = document.createElement('video'); v.preload = 'auto'; v.src = url; });
 playM1();
 </script>

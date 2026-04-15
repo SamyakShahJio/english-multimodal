@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>English Sathi — Mode 2: Text Only</title>
+<title>English Sathi — Text Only</title>
 <style>
 /* ===== FONTS ===== */
 @font-face { font-family: 'JioType'; font-weight: 400; font-display: swap; src: url('https://raw.githubusercontent.com/sunit1986/JioBharatIQ_Server/main/assets/fonts/woff2/JioTypeVarW05-Regular.woff2') format('woff2'); }
@@ -29,7 +29,7 @@ body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; a
 .phone-frame { width: 360px; height: 800px; border-radius: 40px; overflow: hidden; position: relative; background: var(--white); box-shadow: 0 0 0 2px rgba(0,0,0,0.08), 0 24px 80px rgba(0,0,0,0.15); flex-shrink: 0; }
 .screen { position: absolute; inset: 0; overflow: hidden; display: flex; flex-direction: column; }
 
-/* ===== NAV HEADER (always light — no voice = no dark moments) ===== */
+/* ===== NAV HEADER ===== */
 .nav-header { position: absolute; top: 0; left: 0; right: 0; z-index: 150; display: flex; align-items: center; gap: 12px; padding: 14px 16px 8px; color: var(--grey-80); background: var(--white); border-bottom: 1px solid rgba(0,0,0,0.04); }
 .back-btn { width: 36px; height: 36px; border-radius: 50%; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; color: inherit; flex-shrink: 0; }
 .back-btn:active { background: rgba(128,128,128,0.15); }
@@ -60,21 +60,29 @@ body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; a
 .coach-dot span:nth-child(4) { background: #1eccb0; }
 .priya-av { width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-light), var(--primary)); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; color: var(--white); flex-shrink: 0; }
 .sender-name { font-size: 11px; font-weight: 700; margin-bottom: 2px; }
-.sender-name.coach { color: var(--sparkle); }
-.sender-name.priya { color: var(--primary); }
-.chat-bubble { padding: 10px 14px; font-size: 14px; line-height: 1.5; word-break: break-word; }
+.sender-name.coach-label { color: var(--sparkle); }
+.sender-name.priya-label { color: var(--primary); }
+.chat-bubble { padding: 10px 14px; font-size: 14px; line-height: 1.5; word-break: break-word; min-height: 20px; }
 .chat-msg.coach .chat-bubble { background: var(--surface-ghost); color: var(--grey-100); border-radius: 4px 16px 16px 16px; }
 .chat-msg.user .chat-bubble { background: var(--primary); color: var(--white); border-radius: 16px 4px 16px 16px; }
 
 /* ===== TYPING INDICATOR ===== */
 .typing-row { display: flex; gap: 8px; align-self: flex-start; padding: 4px 0; animation: msgIn 0.2s ease-out; }
-.typing-bubble { display: flex; gap: 5px; align-items: center; padding: 12px 18px; background: var(--surface-ghost); border-radius: 4px 16px 16px 16px; }
-.typing-bubble span { width: 6px; height: 6px; border-radius: 50%; background: var(--grey-60); display: inline-block; }
-.typing-bubble span:nth-child(1) { animation: typingBounce 1.2s ease-in-out infinite 0s; }
-.typing-bubble span:nth-child(2) { animation: typingBounce 1.2s ease-in-out infinite 0.15s; }
-.typing-bubble span:nth-child(3) { animation: typingBounce 1.2s ease-in-out infinite 0.3s; }
+.typing-bubble { display: flex; flex-direction: column; gap: 4px; padding: 10px 18px; background: var(--surface-ghost); border-radius: 4px 16px 16px 16px; }
+.typing-dots { display: flex; gap: 5px; align-items: center; }
+.typing-dots span { width: 6px; height: 6px; border-radius: 50%; background: var(--grey-60); display: inline-block; }
+.typing-dots span:nth-child(1) { animation: typingBounce 1.2s ease-in-out infinite 0s; }
+.typing-dots span:nth-child(2) { animation: typingBounce 1.2s ease-in-out infinite 0.15s; }
+.typing-dots span:nth-child(3) { animation: typingBounce 1.2s ease-in-out infinite 0.3s; }
+.typing-context { font-size: 11px; color: var(--grey-60); font-weight: 500; font-style: italic; }
 
-/* ===== INLINE CARDS (scenario, correction, fixes) ===== */
+/* ===== SKELETON CARDS ===== */
+.skeleton { border-radius: var(--r-lg); background: linear-gradient(90deg, var(--grey-20) 25%, #e8e8e8 50%, var(--grey-20) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; max-width: 92%; align-self: flex-start; margin: 4px 0; }
+.skeleton-scenario { height: 160px; width: 100%; }
+.skeleton-correction { height: 80px; width: 100%; }
+.skeleton-fix { height: 52px; width: 90%; }
+
+/* ===== INLINE CARDS ===== */
 .chat-card { max-width: 92%; align-self: flex-start; animation: msgIn 0.3s ease-out; margin: 4px 0; }
 .scenario-card-inline { background: var(--white); border: 1.5px solid var(--grey-40); border-radius: var(--r-lg); padding: 20px; text-align: center; }
 .sc-tag { display: inline-block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--primary); background: var(--primary-light); padding: 4px 12px; border-radius: var(--r-pill); margin-bottom: 12px; }
@@ -85,7 +93,7 @@ body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; a
 
 .correct-card-inline { background: var(--grey-100); border-radius: var(--r-lg); padding: 16px; color: var(--white); max-width: 92%; align-self: flex-start; animation: msgIn 0.3s ease-out; margin: 4px 0; }
 .cc-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--sparkle); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
-.cc-text { font-size: 15px; font-weight: 700; line-height: 1.4; }
+.corr-text { font-size: 15px; font-weight: 700; line-height: 1.4; }
 
 .fix-card-inline { background: var(--white); border: 1.5px solid var(--grey-40); border-radius: var(--r-md); padding: 12px 14px; max-width: 92%; align-self: flex-start; animation: msgIn 0.3s ease-out; margin: 3px 0; }
 .fix-wrong { font-size: 12px; color: var(--error); font-weight: 700; margin-bottom: 3px; }
@@ -113,7 +121,7 @@ body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; a
 .chip.fill { background: var(--primary); color: var(--white); border-color: var(--primary); }
 .chip.fill:active { opacity: 0.85; }
 
-/* ===== INPUT BAR (light, no mic — text only) ===== */
+/* ===== INPUT BAR ===== */
 .chat-input-area { flex-shrink: 0; background: var(--white); border-top: 1px solid rgba(0,0,0,0.06); }
 .text-input-bar { display: flex; align-items: center; gap: 8px; padding: 8px 16px 28px; }
 .text-field { flex: 1; padding: 10px 16px; border-radius: var(--r-pill); border: 1.5px solid var(--grey-40); background: var(--surface-ghost); font-size: 14px; font-family: 'JioType'; outline: none; color: var(--grey-100); transition: border-color 0.2s; }
@@ -122,7 +130,7 @@ body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; a
 .send-btn { width: 40px; height: 40px; border-radius: 50%; border: none; background: var(--primary); color: var(--white); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; }
 .send-btn:active { transform: scale(0.9); }
 
-/* ===== M6 SUMMARY (separate screen, same design as reference) ===== */
+/* ===== M6 SUMMARY ===== */
 .moment { position: absolute; inset: 0; display: flex; flex-direction: column; opacity: 0; pointer-events: none; }
 .moment.active { opacity: 1; pointer-events: auto; animation: momentIn 0.35s ease-out; }
 #m6 { background: var(--white); }
@@ -155,6 +163,7 @@ body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; a
 @keyframes msgIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes typingBounce { 0%, 100% { transform: translateY(0); opacity: 0.4; } 50% { transform: translateY(-4px); opacity: 1; } }
 @keyframes momentIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
@@ -167,11 +176,11 @@ body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; a
 
 <div class="phone-frame">
   <div class="screen">
-    <!-- Nav Header (always light — zero audio means zero dark moments) -->
-    <div class="nav-header" id="navHeader">
+    <!-- Nav Header -->
+    <div class="nav-header">
       <button class="back-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19 11H7.83l4.88-4.88a1.008 1.008 0 00-1.42-1.42l-6.59 6.59a1 1 0 000 1.42l6.59 6.59a1.002 1.002 0 001.639-.325 1 1 0 00-.22-1.095L7.83 13H19a1 1 0 000-2z"/></svg></button>
       <span class="nav-title">English Sathi</span>
-      <span class="mode-label">Mode 2 &middot; Text Only</span>
+      <span class="mode-label">Text Only</span>
     </div>
 
     <!-- Progress -->
@@ -180,7 +189,7 @@ body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; a
       <div class="p-seg"></div><div class="p-seg"></div><div class="p-seg"></div>
     </div>
 
-    <!-- Chat View (M1–M5 as continuous chat flow) -->
+    <!-- Chat View -->
     <div class="chat-view" id="chatView">
       <div class="chat-container" id="chat"></div>
       <div class="chat-input-area" id="inputArea">
@@ -194,7 +203,7 @@ body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; a
       </div>
     </div>
 
-    <!-- M6: Summary (separate full-screen view) -->
+    <!-- M6: Summary -->
     <section class="moment" id="m6">
       <div class="m6-scroll">
         <div class="sum-hero">
@@ -231,7 +240,7 @@ body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; a
 </div>
 
 <script>
-// ===== CONTENT (identical journey, text-only delivery) =====
+// ===== CONTENT =====
 const U = {
   m3: "Hello, I am Rahul. I am working in this company from today. I am very happy for joining.",
   r1: "Before this I was doing job in Pune in a IT company.",
@@ -241,26 +250,59 @@ const U = {
 const ROUNDS = [
   { aiText: "Hey Rahul, nice to meet you! So what were you doing before joining us?", userText: U.r1,
     fixes: [{ w: '"doing job in Pune"', r: '"working at a company in Pune"', why: '"Working at" is the standard way to describe employment' },
-            { w: '"a IT company"', r: '"an IT company"', why: 'Use "an" before vowel sounds — IT starts with /a\u026A/' }] },
+            { w: '"a IT company"', r: '"an IT company"', why: 'Use "an" before vowel sounds' }] },
   { aiText: "What kind of projects were you working on there?", userText: U.r2,
     fixes: [{ w: '"making software"', r: '"developing software"', why: '"Develop" is the professional term in tech' },
-            { w: '"very much interesting"', r: '"very interesting"', why: 'No "much" needed — use "very" directly with adjectives' }] },
+            { w: '"very much interesting"', r: '"very interesting"', why: 'No "much" needed with "very"' }] },
   { aiText: "What are you most looking forward to in this new role?", userText: U.r3,
-    fixes: [{ w: '"looking forward for"', r: '"looking forward to"', why: '"Look forward to" + gerund (learning, meeting)' },
-            { w: '"good peoples"', r: '"great people"', why: '"People" is already plural — never add S' }] }
+    fixes: [{ w: '"looking forward for"', r: '"looking forward to"', why: '"Look forward to" + gerund' },
+            { w: '"good peoples"', r: '"great people"', why: '"People" is already plural' }] }
 ];
 
 // ===== STATE =====
 let gen = 0; let sessionStart = 0; let pendingResolve = null; let pendingUserText = null;
-
-// ===== HELPERS =====
 const $ = id => document.getElementById(id);
 function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
 function scroll() { const c = $('chat'); c.scrollTop = c.scrollHeight; }
 function updateProgress(n) { document.querySelectorAll('.p-seg').forEach((s, i) => { s.classList.toggle('done', i < n - 1); s.classList.toggle('now', i === n - 1); }); }
 
+// ===== PROGRESSIVE TEXT STREAMING =====
+function streamText(el, text, msPerWord) {
+  msPerWord = msPerWord || 80;
+  const words = text.split(/\s+/);
+  el.textContent = '';
+  let i = 0;
+  return new Promise(resolve => {
+    const timer = setInterval(() => {
+      if (i >= words.length) { clearInterval(timer); resolve(); return; }
+      el.textContent += (i > 0 ? ' ' : '') + words[i];
+      scroll();
+      i++;
+    }, msPerWord);
+  });
+}
+
+// ===== SKELETON SYSTEM =====
+function showSkeleton(type) {
+  const el = document.createElement('div');
+  el.className = 'skeleton skeleton-' + type;
+  el.id = 'skel_' + Date.now();
+  $('chat').appendChild(el);
+  scroll();
+  return el;
+}
+
+function replaceSkeleton(skelEl, html) {
+  const t = document.createElement('template');
+  t.innerHTML = html.trim();
+  const real = t.content.firstChild;
+  skelEl.replaceWith(real);
+  scroll();
+  return real;
+}
+
 // ===== CHAT PRIMITIVES =====
-function showTyping(who) {
+function showTyping(who, contextText) {
   hideTyping();
   const c = $('chat');
   const row = document.createElement('div');
@@ -268,36 +310,45 @@ function showTyping(who) {
   const av = who === 'priya'
     ? '<div class="chat-avatar"><div class="priya-av">P</div></div>'
     : '<div class="chat-avatar"><div class="coach-dot"><span></span><span></span><span></span><span></span></div></div>';
-  row.innerHTML = av + '<div class="typing-bubble"><span></span><span></span><span></span></div>';
+  const contextHtml = contextText ? '<div class="typing-context">' + contextText + '</div>' : '';
+  row.innerHTML = av + '<div class="typing-bubble"><div class="typing-dots"><span></span><span></span><span></span></div>' + contextHtml + '</div>';
   c.appendChild(row); scroll();
 }
 function hideTyping() { const el = $('typingEl'); if (el) el.remove(); }
 
-function coachMsg(text) {
-  return new Promise(resolve => {
-    const g = gen; showTyping('coach');
-    setTimeout(() => {
-      if (g !== gen) { hideTyping(); resolve(); return; }
-      hideTyping();
-      const msg = document.createElement('div'); msg.className = 'chat-msg coach';
-      msg.innerHTML = '<div class="chat-avatar"><div class="coach-dot"><span></span><span></span><span></span><span></span></div></div>'
-        + '<div><div class="sender-name coach">English Sathi</div><div class="chat-bubble">' + text + '</div></div>';
-      $('chat').appendChild(msg); scroll(); resolve();
-    }, Math.min(600 + text.length * 10, 2000));
+function coachMsg(text, contextLabel) {
+  return new Promise(async resolve => {
+    const g = gen;
+    showTyping('coach', contextLabel || null);
+    await wait(Math.min(800 + text.length * 6, 2000));
+    if (g !== gen) { hideTyping(); resolve(); return; }
+    hideTyping();
+    const msg = document.createElement('div'); msg.className = 'chat-msg coach';
+    msg.innerHTML = '<div class="chat-avatar"><div class="coach-dot"><span></span><span></span><span></span><span></span></div></div>'
+      + '<div><div class="sender-name coach-label">English Sathi</div><div class="chat-bubble"></div></div>';
+    $('chat').appendChild(msg);
+    const bubble = msg.querySelector('.chat-bubble');
+    await streamText(bubble, text);
+    if (g !== gen) { resolve(); return; }
+    resolve();
   });
 }
 
-function priyaMsg(text) {
-  return new Promise(resolve => {
-    const g = gen; showTyping('priya');
-    setTimeout(() => {
-      if (g !== gen) { hideTyping(); resolve(); return; }
-      hideTyping();
-      const msg = document.createElement('div'); msg.className = 'chat-msg coach';
-      msg.innerHTML = '<div class="chat-avatar"><div class="priya-av">P</div></div>'
-        + '<div><div class="sender-name priya">Priya</div><div class="chat-bubble">' + text + '</div></div>';
-      $('chat').appendChild(msg); scroll(); resolve();
-    }, Math.min(600 + text.length * 10, 2000));
+function priyaMsg(text, contextLabel) {
+  return new Promise(async resolve => {
+    const g = gen;
+    showTyping('priya', contextLabel || 'Priya is typing...');
+    await wait(Math.min(800 + text.length * 6, 2000));
+    if (g !== gen) { hideTyping(); resolve(); return; }
+    hideTyping();
+    const msg = document.createElement('div'); msg.className = 'chat-msg coach';
+    msg.innerHTML = '<div class="chat-avatar"><div class="priya-av">P</div></div>'
+      + '<div><div class="sender-name priya-label">Priya</div><div class="chat-bubble"></div></div>';
+    $('chat').appendChild(msg);
+    const bubble = msg.querySelector('.chat-bubble');
+    await streamText(bubble, text);
+    if (g !== gen) { resolve(); return; }
+    resolve();
   });
 }
 
@@ -312,9 +363,7 @@ function addEl(html) {
   c.appendChild(t.content.firstChild); scroll();
 }
 
-function divider(text) {
-  addEl('<div class="chat-divider"><span>' + text + '</span></div>');
-}
+function divider(text) { addEl('<div class="chat-divider"><span>' + text + '</span></div>'); }
 
 function showChip(label, fill, fn) {
   const row = $('chipRow'); row.innerHTML = '';
@@ -335,11 +384,11 @@ function waitForUser(text) {
 }
 
 function onSend() {
-  const field = $('chatField'); const text = field.value.trim(); field.value = '';
+  const field = $('chatField'); field.value = '';
   if (pendingResolve) { userMsg(pendingUserText); const r = pendingResolve; pendingResolve = null; pendingUserText = null; $('chipRow').innerHTML = ''; r(); }
 }
 
-// ===== FLOW (timer-based, zero audio) =====
+// ===== FLOW =====
 
 // M1 — Greeting
 async function playM1() {
@@ -351,29 +400,43 @@ async function playM1() {
   showChip("Let's start! \u2192", true, playM2);
 }
 
-// M2 — Scenario card + prompt
+// M2 — Scenario card
 async function playM2() {
   const g = gen; updateProgress(2);
-  addEl('<div class="chat-card"><div class="scenario-card-inline"><div class="sc-tag">OFFICE &middot; FORMAL</div><div class="sc-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M20 7h-4V5c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zM10 5h4v2h-4V5z"/></svg></div><div class="sc-en">Introduce yourself to your new team</div><div class="sc-hint"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/></svg><span>Think about: your name, role, and why you\'re excited</span></div></div></div>');
-  await wait(400); if (g !== gen) return;
-  await coachMsg('Try it in English! How would you introduce yourself?');
+  // Show skeleton first, then real card
+  const skel = showSkeleton('scenario');
+  await wait(700);
+  if (g !== gen) return;
+  replaceSkeleton(skel, '<div class="chat-card"><div class="scenario-card-inline"><div class="sc-tag">OFFICE &middot; FORMAL</div><div class="sc-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M20 7h-4V5c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zM10 5h4v2h-4V5z"/></svg></div><div class="sc-en">Introduce yourself to your new team</div><div class="sc-hint"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/></svg><span>Think about: your name, role, and why you\'re excited</span></div></div></div>');
+  await wait(300); if (g !== gen) return;
+  await coachMsg('Try it in English! How would you introduce yourself?', 'Setting up scenario...');
   if (g !== gen) return;
   await waitForUser(U.m3);
   if (g !== gen) return;
   updateProgress(3);
-  await wait(400);
+  await wait(300);
   playM4();
 }
 
 // M4 — Correction
 async function playM4() {
   const g = gen; updateProgress(4);
-  addEl('<div class="correct-card-inline"><div class="cc-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm5.21 7.71l-6 6a1 1 0 01-1.42 0l-3-3a1 1 0 111.42-1.42l2.29 2.3 5.29-5.3a1 1 0 011.42 1.42z"/></svg> Better way to say it</div><div class="cc-text">\u201CHi everyone, I\u2019m Rahul. I\u2019ve just joined the team today, and I\u2019m really excited to be here.\u201D</div></div>');
+  // Skeleton for correction card
+  const skel = showSkeleton('correction');
+  showTyping('coach', 'Analyzing your grammar...');
+  await wait(1200);
+  if (g !== gen) return;
+  hideTyping();
+  replaceSkeleton(skel, '<div class="correct-card-inline"><div class="cc-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm5.21 7.71l-6 6a1 1 0 01-1.42 0l-3-3a1 1 0 111.42-1.42l2.29 2.3 5.29-5.3a1 1 0 011.42 1.42z"/></svg> Better way to say it</div><div class="corr-text">\u201CHi everyone, I\u2019m Rahul. I\u2019ve just joined the team today, and I\u2019m really excited to be here.\u201D</div></div>');
   await wait(300); if (g !== gen) return;
-  addEl('<div class="fix-card-inline"><div class="fix-wrong">\u2715 "I am working in this company from today"</div><div class="fix-right">\u2713 "I\u2019ve just joined the team today"</div></div>');
-  await wait(250); if (g !== gen) return;
-  addEl('<div class="fix-card-inline"><div class="fix-wrong">\u2715 "I am very happy for joining"</div><div class="fix-right">\u2713 "I\u2019m really excited to be here"</div></div>');
-  await wait(500); if (g !== gen) return;
+  // Fix cards with skeletons
+  const skel1 = showSkeleton('fix');
+  await wait(400); if (g !== gen) return;
+  replaceSkeleton(skel1, '<div class="fix-card-inline"><div class="fix-wrong">\u2715 "I am working in this company from today"</div><div class="fix-right">\u2713 "I\u2019ve just joined the team today"</div></div>');
+  const skel2 = showSkeleton('fix');
+  await wait(400); if (g !== gen) return;
+  replaceSkeleton(skel2, '<div class="fix-card-inline"><div class="fix-wrong">\u2715 "I am very happy for joining"</div><div class="fix-right">\u2713 "I\u2019m really excited to be here"</div></div>');
+  await wait(400); if (g !== gen) return;
   showChip('Practice with AI \u2192', true, playM5);
 }
 
@@ -389,14 +452,19 @@ async function playM5() {
     if (g !== gen) return;
     await waitForUser(round.userText);
     if (g !== gen) return;
-    await wait(300); if (g !== gen) return;
+
+    // Skeleton for fix panel
+    const skel = showSkeleton('correction');
+    showTyping('coach', 'Checking your response...');
+    await wait(800); if (g !== gen) return;
+    hideTyping();
 
     let fhtml = '<div class="fix-panel-inline"><div class="fp-label">Quick Fix</div>';
     round.fixes.forEach(f => {
       fhtml += '<div class="fp-row"><span class="fp-wrong">' + f.w + '</span><span class="fp-right">' + f.r + '</span><div class="fp-why">' + f.why + '</div></div>';
     });
     fhtml += '</div>';
-    addEl(fhtml);
+    replaceSkeleton(skel, fhtml);
     await wait(500); if (g !== gen) return;
   }
 
@@ -405,7 +473,7 @@ async function playM5() {
   showChip('View Summary \u2192', true, playM6);
 }
 
-// M6 — Summary screen
+// M6 — Summary
 function playM6() {
   updateProgress(6);
   $('chatView').style.display = 'none';

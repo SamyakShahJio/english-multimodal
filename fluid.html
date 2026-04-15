@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>English Sathi — Fluid Experience</title>
+<style>
+/* ===== FONTS ===== */
+@font-face { font-family: 'JioType'; font-weight: 400; font-display: swap; src: url('https://raw.githubusercontent.com/sunit1986/JioBharatIQ_Server/main/assets/fonts/woff2/JioTypeVarW05-Regular.woff2') format('woff2'); }
+@font-face { font-family: 'JioType'; font-weight: 500; font-display: swap; src: url('https://raw.githubusercontent.com/sunit1986/JioBharatIQ_Server/main/assets/fonts/woff2/JioTypeW05-Medium.woff2') format('woff2'); }
+@font-face { font-family: 'JioType'; font-weight: 700; font-display: swap; src: url('https://raw.githubusercontent.com/sunit1986/JioBharatIQ_Server/main/assets/fonts/woff2/JioTypeW05-Bold.woff2') format('woff2'); }
+@font-face { font-family: 'JioType'; font-weight: 900; font-display: swap; src: url('https://raw.githubusercontent.com/sunit1986/JioBharatIQ_Server/main/assets/fonts/woff2/JioTypeW05-Black.woff2') format('woff2'); }
+
+/* ===== TOKENS ===== */
+:root {
+  --primary: #3535f3; --primary-light: #e8e8fc; --primary-dark: #3900ad;
+  --secondary: #f7ab20; --sparkle: #1eccb0; --error: #fa2f40; --success: #25ab21;
+  --grey-100: #141414; --grey-80: #5c5c5c; --grey-60: #8f8f8f; --grey-40: #e0e0e0; --grey-20: #f5f5f5;
+  --surface-ghost: #eeeeef; --white: #ffffff;
+  --r-sm: 8px; --r-md: 12px; --r-lg: 16px; --r-xl: 23px; --r-pill: 999px;
+  --dark-bg: linear-gradient(180deg, #08081a 0%, #0d1528 100%);
+}
+
+/* ===== RESET ===== */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; overflow: hidden; }
+body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+
+/* ===== PHONE FRAME ===== */
+.phone-frame { width: 360px; height: 800px; border-radius: 40px; overflow: hidden; position: relative; background: var(--grey-100); box-shadow: 0 0 0 2px rgba(0,0,0,0.08), 0 24px 80px rgba(0,0,0,0.15); flex-shrink: 0; }
+.screen { position: absolute; inset: 0; overflow: hidden; background: var(--dark-bg); }
+
+/* ===== NAV ===== */
+.nav-header { position: absolute; top: 0; left: 0; right: 0; z-index: 150; display: flex; align-items: center; gap: 12px; padding: 14px 16px 8px; color: rgba(255,255,255,0.7); }
+.back-btn { width: 36px; height: 36px; border-radius: 50%; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; color: inherit; flex-shrink: 0; }
+.nav-title { font-size: 15px; font-weight: 700; }
+.mode-label { margin-left: auto; font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; padding: 3px 8px; border-radius: var(--r-pill); background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.45); }
+
+/* ===== PROGRESS ===== */
+.progress { position: absolute; top: 56px; left: 0; right: 0; z-index: 100; display: flex; gap: 3px; padding: 0 20px; }
+.p-seg { flex: 1; height: 3px; border-radius: 2px; background: rgba(128,128,128,0.2); transition: background 0.4s; }
+.p-seg.done { background: var(--primary); }
+.p-seg.now { background: var(--primary); opacity: 0.65; }
+
+/* ===== AVATAR (dynamic sizing) ===== */
+.avatar-area { position: absolute; top: 70px; left: 0; right: 0; z-index: 5; display: flex; flex-direction: column; align-items: center; transition: all 0.4s ease; }
+.avatar-area.large { top: 160px; }
+.avatar-area.medium { top: 80px; }
+.avatar-area.small { top: 64px; left: auto; right: 16px; align-items: flex-end; }
+.status-text { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.4); margin-bottom: 12px; min-height: 18px; transition: all 0.3s; }
+.avatar-vid { border-radius: 0; object-fit: cover; z-index: 1; background: transparent; mix-blend-mode: screen; transition: all 0.4s ease; }
+.avatar-area.large .avatar-vid { width: 160px; height: 160px; }
+.avatar-area.medium .avatar-vid { width: 120px; height: 120px; }
+.avatar-area.small .avatar-vid { width: 60px; height: 60px; }
+.avatar-area.small .status-text { display: none; }
+
+/* ===== WAVE BARS ===== */
+.wave-bars { display: flex; gap: 3px; align-items: center; height: 48px; margin-top: 12px; opacity: 0; transition: opacity 0.3s; }
+.wave-bars.active { opacity: 1; }
+.wave-bars span { width: 4px; border-radius: 99px; background: var(--primary); height: 8px; }
+.wave-bars.active span { animation: waveBar 0.7s ease-in-out infinite; animation-delay: calc(var(--d) * 0.07s); }
+
+/* ===== CARD AREA ===== */
+.card-area { position: absolute; bottom: 60px; left: 16px; right: 16px; z-index: 50; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; transition: top 0.4s; }
+.card-area::-webkit-scrollbar { width: 0; }
+.card-area.below-medium { top: 280px; }
+.card-area.below-small { top: 130px; }
+.card-area.full { top: 80px; }
+
+/* ===== OVERLAY CARDS ===== */
+.overlay-card { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--r-lg); padding: 20px; color: var(--white); backdrop-filter: blur(8px); animation: cardIn 0.35s ease-out; text-align: center; }
+.overlay-card .sc-tag { display: inline-block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.8); background: rgba(53,53,243,0.25); padding: 4px 12px; border-radius: var(--r-pill); margin-bottom: 12px; }
+.overlay-card .sc-icon { width: 44px; height: 44px; border-radius: var(--r-md); background: var(--primary); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; color: var(--white); }
+.overlay-card .sc-en { font-size: 16px; font-weight: 900; line-height: 1.3; margin-bottom: 8px; }
+.overlay-card .sc-hint { display: flex; align-items: center; gap: 8px; font-size: 12px; color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.06); padding: 8px 12px; border-radius: var(--r-sm); text-align: left; }
+.overlay-card .sc-hint svg { flex-shrink: 0; color: var(--secondary); }
+
+.overlay-correction { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--r-lg); padding: 16px; color: var(--white); backdrop-filter: blur(8px); animation: cardIn 0.35s ease-out; }
+.overlay-correction .cc-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--sparkle); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+.overlay-correction .corr-text { font-size: 15px; font-weight: 700; line-height: 1.4; }
+
+.overlay-fix { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--r-md); padding: 12px 14px; color: var(--white); animation: cardIn 0.3s ease-out; }
+.overlay-fix .fix-wrong { font-size: 12px; color: rgba(250,47,64,0.85); font-weight: 700; margin-bottom: 3px; }
+.overlay-fix .fix-right { font-size: 12px; color: var(--sparkle); font-weight: 700; }
+
+.overlay-panel { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.06); border-radius: var(--r-md); padding: 14px 16px; color: var(--white); animation: cardIn 0.35s ease-out; }
+.overlay-panel .ct-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.3); margin-bottom: 8px; }
+.overlay-panel .ct-name { font-size: 11px; font-weight: 700; color: var(--sparkle); margin-bottom: 4px; }
+.overlay-panel .ct-text { font-size: 14px; line-height: 1.5; color: rgba(255,255,255,0.85); }
+.overlay-panel .ct-you { font-size: 11px; font-weight: 700; color: var(--secondary); margin-top: 10px; margin-bottom: 4px; }
+.overlay-panel .ct-user { font-size: 13px; color: rgba(255,255,255,0.5); font-style: italic; }
+
+.overlay-fix-panel { background: rgba(255,255,255,0.04); border-left: 3px solid var(--secondary); border-radius: 4px var(--r-md) var(--r-md) 4px; padding: 12px 14px; color: var(--white); animation: cardIn 0.3s ease-out; }
+.overlay-fix-panel .fp-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--secondary); margin-bottom: 8px; }
+.overlay-fix-panel .fp-wrong { font-size: 12px; color: rgba(250,47,64,0.8); text-decoration: line-through; }
+.overlay-fix-panel .fp-right { font-size: 12px; color: var(--sparkle); font-weight: 700; margin-left: 6px; }
+.overlay-fix-panel .fp-why { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+
+/* ===== SKELETON ===== */
+.skeleton-dark { border-radius: var(--r-lg); background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+.skel-scenario { height: 150px; }
+.skel-correction { height: 70px; }
+
+/* ===== INTERRUPT ===== */
+.interrupt-btn { position: absolute; bottom: 220px; left: 50%; transform: translateX(-50%); z-index: 200; padding: 8px 20px; border-radius: var(--r-pill); border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.6); font-size: 12px; font-weight: 700; font-family: 'JioType'; cursor: pointer; backdrop-filter: blur(8px); display: none; }
+.interrupt-btn.show { display: flex; align-items: center; gap: 6px; }
+.interrupt-btn svg { width: 14px; height: 14px; }
+
+/* ===== AURORA ===== */
+.aurora { position: absolute; bottom: -40px; left: 0; right: 0; height: 200px; pointer-events: none; z-index: 10; }
+.aurora-band { position: absolute; left: -20%; right: -20%; height: 2px; border-radius: 50%; transition: all 0.5s; }
+.ab1 { bottom: 100px; background: #3535f3; box-shadow: 0 0 80px 40px rgba(53,53,243,0.6), 0 0 160px 80px rgba(53,53,243,0.25); animation: abDrift1 5s ease-in-out infinite; }
+.ab2 { bottom: 110px; background: #6464ff; box-shadow: 0 0 60px 30px rgba(100,100,255,0.4), 0 0 120px 60px rgba(100,100,255,0.15); animation: abDrift2 7s ease-in-out infinite; }
+.ab3 { bottom: 90px; background: #1eccb0; box-shadow: 0 0 50px 25px rgba(30,204,176,0.3), 0 0 100px 50px rgba(30,204,176,0.1); animation: abDrift3 6s ease-in-out infinite; }
+.aurora.speaking .ab1 { animation-duration: 2.5s; box-shadow: 0 0 100px 50px rgba(53,53,243,0.8), 0 0 200px 100px rgba(53,53,243,0.35); }
+.aurora.speaking .ab2 { animation-duration: 3.5s; box-shadow: 0 0 80px 40px rgba(100,100,255,0.6), 0 0 160px 80px rgba(100,100,255,0.25); }
+.aurora.speaking .ab3 { animation-duration: 3s; box-shadow: 0 0 70px 35px rgba(30,204,176,0.45), 0 0 140px 70px rgba(30,204,176,0.15); }
+.aurora.thinking .ab1 { animation-duration: 8s; box-shadow: 0 0 60px 30px rgba(247,171,32,0.4), 0 0 120px 60px rgba(247,171,32,0.15); }
+.aurora.thinking .ab2 { animation-duration: 10s; box-shadow: 0 0 50px 25px rgba(100,100,255,0.25), 0 0 100px 50px rgba(100,100,255,0.1); }
+.aurora.thinking .ab3 { animation-duration: 9s; box-shadow: 0 0 40px 20px rgba(30,204,176,0.2), 0 0 80px 40px rgba(30,204,176,0.08); }
+
+/* ===== CC ===== */
+.cc-overlay { position: absolute; bottom: 44px; left: 16px; right: 16px; z-index: 200; text-align: center; pointer-events: none; opacity: 0; transition: opacity 0.3s; }
+.cc-overlay.show { opacity: 1; }
+.cc-text { display: inline-block; background: rgba(0,0,0,0.75); color: var(--white); font-size: 14px; line-height: 1.5; padding: 8px 16px; border-radius: var(--r-md); max-width: 100%; backdrop-filter: blur(8px); }
+
+/* ===== VOICE STRIP ===== */
+.voice-strip { position: absolute; bottom: 10px; left: 0; right: 0; z-index: 250; display: flex; align-items: center; justify-content: center; gap: 2px; height: 24px; pointer-events: none; opacity: 0; transition: opacity 0.4s; }
+.voice-strip.active { opacity: 1; }
+.voice-strip span { width: 2.5px; border-radius: 99px; height: 4px; background: rgba(255,255,255,0.4); }
+.voice-strip.active span { animation: vsBar 0.7s ease-in-out infinite; animation-delay: calc(var(--d) * 0.04s); }
+.voice-strip.processing { opacity: 0.6; }
+.voice-strip.processing span { animation: vsBar 1.4s ease-in-out infinite; }
+
+/* ===== CALL HEADER ===== */
+.call-header { position: absolute; top: 64px; right: 16px; z-index: 20; text-align: right; color: var(--white); opacity: 0; transition: opacity 0.4s; pointer-events: none; }
+.call-header.show { opacity: 1; }
+.call-name { font-size: 14px; font-weight: 900; }
+.call-stat { font-size: 11px; color: var(--sparkle); font-weight: 700; margin-top: 2px; display: flex; align-items: center; justify-content: flex-end; gap: 6px; }
+.dot-pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--sparkle); animation: dotPulse 1.5s infinite; display: inline-block; }
+.call-time { font-size: 10px; color: rgba(255,255,255,0.2); margin-top: 1px; }
+
+/* ===== SUMMARY ===== */
+.summary-overlay { position: absolute; inset: 0; z-index: 300; background: var(--dark-bg); display: flex; flex-direction: column; opacity: 0; pointer-events: none; transition: opacity 0.4s; }
+.summary-overlay.active { opacity: 1; pointer-events: auto; }
+.sum-scroll { flex: 1; overflow-y: auto; padding: 72px 20px 24px; display: flex; flex-direction: column; gap: 16px; }
+.sum-scroll::-webkit-scrollbar { width: 0; }
+.sum-hero { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border-radius: var(--r-lg); padding: 28px 20px; color: var(--white); text-align: center; }
+.sum-badge { width: 56px; height: 56px; border-radius: 50%; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; }
+.sum-title { font-size: 20px; font-weight: 900; margin-bottom: 4px; }
+.sum-sub { font-size: 14px; opacity: 0.75; margin-bottom: 16px; }
+.sum-stats { display: flex; gap: 12px; justify-content: center; }
+.stat { background: rgba(255,255,255,0.12); border-radius: var(--r-sm); padding: 10px 16px; text-align: center; flex: 1; }
+.stat-val { font-size: 18px; font-weight: 900; }
+.stat-lbl { font-size: 10px; opacity: 0.6; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+.sum-section { border: 1.5px solid rgba(255,255,255,0.1); border-radius: var(--r-lg); padding: 16px; }
+.sum-section h3 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.4); margin-bottom: 12px; }
+.sf-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.06); color: var(--white); }
+.sf-row:last-child { border-bottom: none; }
+.sf-wrong { color: var(--error); text-decoration: line-through; flex: 1; opacity: 0.8; }
+.sf-arrow { color: rgba(255,255,255,0.2); }
+.sf-right { color: var(--sparkle); font-weight: 700; flex: 1; }
+.sp-item { padding: 6px 0; font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.8); border-bottom: 1px solid rgba(255,255,255,0.06); }
+.sp-item:last-child { border-bottom: none; }
+.sum-actions { display: flex; gap: 10px; }
+.btn-fill { flex: 1; padding: 14px; border-radius: var(--r-pill); border: none; background: var(--primary); color: var(--white); font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'JioType'; }
+.btn-ghost-dark { flex: 1; padding: 14px; border-radius: var(--r-pill); border: 1.5px solid rgba(255,255,255,0.2); background: transparent; color: rgba(255,255,255,0.7); font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'JioType'; }
+
+/* ===== ANIMATIONS ===== */
+@keyframes abDrift1 { 0%, 100% { transform: translateX(0) scaleX(1); opacity: 0.8; } 50% { transform: translateX(3%) scaleX(1.05); opacity: 1; } }
+@keyframes abDrift2 { 0%, 100% { transform: translateX(0) scaleX(1); opacity: 0.6; } 50% { transform: translateX(-4%) scaleX(1.08); opacity: 0.85; } }
+@keyframes abDrift3 { 0%, 100% { transform: translateX(0) scaleX(1); opacity: 0.5; } 50% { transform: translateX(2%) scaleX(1.03); opacity: 0.7; } }
+@keyframes vsBar { 0%, 100% { height: 4px; opacity: 0.3; } 50% { height: 16px; opacity: 0.8; } }
+@keyframes waveBar { 0%, 100% { height: 8px; opacity: 0.3; } 50% { height: 36px; opacity: 1; } }
+@keyframes dotPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+@keyframes cardIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+@media (max-width: 768px) {
+  body { background: #000 !important; padding: 0 !important; }
+  .phone-frame { width: 100% !important; height: 100vh !important; height: 100dvh !important; border-radius: 0 !important; box-shadow: none !important; max-width: 100% !important; }
+}
+</style>
+</head>
+<body>
+<div class="phone-frame"><div class="screen">
+  <div class="nav-header">
+    <button class="back-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19 11H7.83l4.88-4.88a1.008 1.008 0 00-1.42-1.42l-6.59 6.59a1 1 0 000 1.42l6.59 6.59a1.002 1.002 0 001.639-.325 1 1 0 00-.22-1.095L7.83 13H19a1 1 0 000-2z"/></svg></button>
+    <span class="nav-title">English Sathi</span>
+    <span class="mode-label">Fluid</span>
+  </div>
+  <div class="progress" id="progress"><div class="p-seg now"></div><div class="p-seg"></div><div class="p-seg"></div><div class="p-seg"></div><div class="p-seg"></div><div class="p-seg"></div></div>
+
+  <div class="avatar-area large" id="avatarArea">
+    <div class="status-text" id="statusText"></div>
+    <video id="avatarVid" class="avatar-vid" autoplay loop muted playsinline></video>
+    <div class="wave-bars" id="waveBars"><span style="--d:0"></span><span style="--d:1"></span><span style="--d:2"></span><span style="--d:3"></span><span style="--d:4"></span><span style="--d:5"></span><span style="--d:6"></span><span style="--d:7"></span><span style="--d:8"></span><span style="--d:9"></span><span style="--d:10"></span></div>
+  </div>
+
+  <div class="card-area below-medium" id="cardArea"></div>
+
+  <button class="interrupt-btn" id="interruptBtn" onclick="onInterrupt()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg> Cut in</button>
+
+  <div class="call-header" id="callHeader">
+    <div class="call-name">Priya</div>
+    <div class="call-stat" id="callStat"><span class="dot-pulse"></span> Connected</div>
+    <div class="call-time" id="callTime">00:00</div>
+  </div>
+
+  <div class="aurora" id="aurora"><div class="aurora-band ab1"></div><div class="aurora-band ab2"></div><div class="aurora-band ab3"></div></div>
+  <div class="cc-overlay" id="ccOverlay"><div class="cc-text" id="ccText"></div></div>
+  <div class="voice-strip" id="voiceStrip"><span style="--d:0"></span><span style="--d:1"></span><span style="--d:2"></span><span style="--d:3"></span><span style="--d:4"></span><span style="--d:5"></span><span style="--d:6"></span><span style="--d:7"></span><span style="--d:8"></span><span style="--d:9"></span><span style="--d:10"></span><span style="--d:11"></span><span style="--d:12"></span><span style="--d:13"></span><span style="--d:14"></span><span style="--d:15"></span><span style="--d:16"></span><span style="--d:17"></span><span style="--d:18"></span><span style="--d:19"></span><span style="--d:20"></span><span style="--d:21"></span><span style="--d:22"></span><span style="--d:23"></span></div>
+
+  <div class="summary-overlay" id="summaryOverlay"><div class="sum-scroll">
+    <div class="sum-hero"><div class="sum-badge"><svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div><div class="sum-title">Session Complete!</div><div class="sum-sub">Bahut achha kiya, Rahul!</div>
+      <div class="sum-stats"><div class="stat"><div class="stat-val" id="sumTime">0:00</div><div class="stat-lbl">Duration</div></div><div class="stat"><div class="stat-val">8</div><div class="stat-lbl">Phrases</div></div><div class="stat"><div class="stat-val">5</div><div class="stat-lbl">Corrections</div></div></div></div>
+    <div class="sum-section"><h3>Key Corrections</h3>
+      <div class="sf-row"><span class="sf-wrong">"I am working from today"</span><span class="sf-arrow">&rarr;</span><span class="sf-right">"I've just joined"</span></div>
+      <div class="sf-row"><span class="sf-wrong">"happy for joining"</span><span class="sf-arrow">&rarr;</span><span class="sf-right">"excited to be here"</span></div>
+      <div class="sf-row"><span class="sf-wrong">"doing job in Pune"</span><span class="sf-arrow">&rarr;</span><span class="sf-right">"working at a company"</span></div>
+      <div class="sf-row"><span class="sf-wrong">"making software"</span><span class="sf-arrow">&rarr;</span><span class="sf-right">"developing software"</span></div>
+      <div class="sf-row"><span class="sf-wrong">"good peoples"</span><span class="sf-arrow">&rarr;</span><span class="sf-right">"great people"</span></div></div>
+    <div class="sum-section"><h3>Phrases Learned</h3>
+      <div class="sp-item">"I've just joined the team"</div><div class="sp-item">"I'm really excited to be here"</div><div class="sp-item">"I was working at an IT company"</div><div class="sp-item">"developing software for banks"</div><div class="sp-item">"looking forward to learning"</div></div>
+    <div class="sum-actions"><button class="btn-fill" onclick="restart()">Practice Again</button><button class="btn-ghost-dark" onclick="restart()">Back to Menu</button></div>
+  </div></div>
+</div></div>
+
+<script>
+const API_KEY = 'sk_86a2daf2318ba84afa5190ff9a2c09fcc9e7f9dafea1fe79';
+const VOICE_ID = 'FaqthkZu1EWxXxUFbAfb';
+const TTS_URL = `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`;
+const AV = { idle:'https://raw.githubusercontent.com/sunit1986/JioBharatIQ_Server/main/assets/states/Dark/HelloJio_Breath(IdleState)_242.mp4', speak:'https://raw.githubusercontent.com/sunit1986/JioBharatIQ_Server/main/assets/states/Dark/HelloJio_BotSpeaking_242.mp4', listen:'https://raw.githubusercontent.com/sunit1986/JioBharatIQ_Server/main/assets/states/Dark/HelloJio_Listening_242.mp4' };
+
+const V = { m1:"Namaste! Main tumhara English learning saathi hoon. Aaj hum ek situation ke liye practice karenge. Socho ki tum ek new office mein apna introduction de rahe ho.",
+  m2:"Imagine you have just joined a new company. Your manager asks you to introduce yourself to the team. Think about your name, your role, and why you are excited. Try saying it in English.",
+  m4:"Great attempt! Here is a more natural way to say it. Hi everyone, I am Rahul. I have just joined the team today, and I am really excited to be here.",
+  m4f:"Two quick fixes. Instead of I am working in this company from today, say I have just joined the team today. And instead of I am very happy for joining, say I am really excited to be here.",
+  m5r1:"Now let us practice! I will be your colleague Priya. Hey Rahul, nice to meet you! So what were you doing before joining us?",
+  m5c1:"Good! Small fix. Say, I was working at an IT company in Pune, instead of doing job in Pune.",
+  m5r2:"That sounds interesting! What kind of projects were you working on there?",
+  m5c2:"Nice! Say developing software, not making software. And it is very interesting, not very much interesting.",
+  m5r3:"Great! What are you most looking forward to in this new role?",
+  m5c3:"Almost perfect! Say looking forward to, not looking forward for. People is already plural.",
+  m6:"Bahut achha, Rahul! Aaj tumne teen important cheezein seekhi. Keep practicing!" };
+const FILLERS = ["Ek second, checking kar raha hoon...","Hmm, soch raha hoon...","Achha, dekhte hain..."];
+const U = { m3:"Hello, I am Rahul. I am working in this company from today. I am very happy for joining.",
+  r1:"Before this I was doing job in Pune in a IT company.", r2:"I was making software for banks. It was very much interesting work.",
+  r3:"I am looking forward for learning new things and meeting good peoples." };
+const ROUNDS = [
+  { aiVoice:V.m5r1, corrVoice:V.m5c1, userText:U.r1, aiText:"Hey Rahul, nice to meet you! So what were you doing before joining us?",
+    fixes:[{w:'"doing job in Pune"',r:'"working at a company"',why:'"Working at" is standard'},{w:'"a IT company"',r:'"an IT company"',why:'Use "an" before vowel sounds'}] },
+  { aiVoice:V.m5r2, corrVoice:V.m5c2, userText:U.r2, aiText:"What kind of projects were you working on there?",
+    fixes:[{w:'"making software"',r:'"developing software"',why:'"Develop" is professional'},{w:'"very much interesting"',r:'"very interesting"',why:'No "much" needed'}] },
+  { aiVoice:V.m5r3, corrVoice:V.m5c3, userText:U.r3, aiText:"What are you most looking forward to in this new role?",
+    fixes:[{w:'"looking forward for"',r:'"looking forward to"',why:'"Look forward to" + gerund'},{w:'"good peoples"',r:'"great people"',why:'"People" is already plural'}] }
+];
+
+// ===== ENGINE (same as voice_only) =====
+const ttsCache=new Map(); let currentAudio=null; let audioCtx=null;
+function unlockAudio(){try{if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume();}catch(e){}}
+function stopAudio(){if(currentAudio){const r=currentAudio._resolve;currentAudio.pause();currentAudio.currentTime=0;currentAudio=null;if(r)r();}speechSynthesis.cancel();setVoiceActive(false);}
+function speak(t,p){p=p||1;return new Promise(async(resolve)=>{unlockAudio();stopAudio();const k=t+'|'+p;
+  if(ttsCache.has(k)){playUrl(ttsCache.get(k),resolve);return;}
+  try{const r=await fetch(TTS_URL,{method:'POST',headers:{'xi-api-key':API_KEY,'Content-Type':'application/json'},
+    body:JSON.stringify({text:t,model_id:'eleven_turbo_v2_5',voice_settings:{stability:0.5,similarity_boost:0.75,speed:p}})});
+    if(!r.ok)throw 0;const b=await r.blob();const u=URL.createObjectURL(b);ttsCache.set(k,u);playUrl(u,resolve);
+  }catch(e){setVoiceActive(true);browserTTS(t,0.85);setTimeout(()=>{setVoiceActive(false);resolve();},Math.min(t.length*65,8000));}});}
+function playUrl(u,onend){const a=new Audio(u);currentAudio=a;a._resolve=onend;setVoiceActive(true);
+  a.onended=()=>{setVoiceActive(false);currentAudio=null;if(onend)onend();};a.onerror=()=>{setVoiceActive(false);currentAudio=null;if(onend)onend();};
+  a.play().catch(()=>{setVoiceActive(false);currentAudio=null;if(onend)setTimeout(onend,500);});}
+function browserTTS(t,r){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=r||0.85;speechSynthesis.speak(u);}
+function preCache(t,p){p=p||1;const k=t+'|'+p;if(ttsCache.has(k))return;
+  fetch(TTS_URL,{method:'POST',headers:{'xi-api-key':API_KEY,'Content-Type':'application/json'},
+    body:JSON.stringify({text:t,model_id:'eleven_turbo_v2_5',voice_settings:{stability:0.5,similarity_boost:0.75,speed:p}})
+  }).then(r=>r.blob()).then(b=>{ttsCache.set(k,URL.createObjectURL(b));}).catch(()=>{});}
+
+let ccTimer=null;
+function streamCC(t,ms){ms=ms||120;clearCCStream();const w=t.split(/\s+/);const el=$('ccText');el.textContent='';$('ccOverlay').classList.add('show');let i=0;
+  return new Promise(r=>{ccTimer=setInterval(()=>{if(i>=w.length){clearInterval(ccTimer);ccTimer=null;r();return;}el.textContent+=(i>0?' ':'')+w[i];i++;},ms);});}
+function clearCCStream(){if(ccTimer){clearInterval(ccTimer);ccTimer=null;}}
+function clearCC(){clearCCStream();$('ccOverlay').classList.remove('show');$('ccText').textContent='';}
+
+function setAvatar(s){const v=$('avatarVid');if(!v||v.dataset.av===s)return;v.dataset.av=s;v.style.opacity='0';
+  setTimeout(()=>{v.src=AV[s];v.load();v.play().catch(()=>{});v.style.opacity='1';},150);}
+function setVoiceActive(on){$('voiceStrip').classList.toggle('active',on);$('aurora').classList.toggle('speaking',on);if(!on)$('aurora').classList.remove('speaking');}
+function setThinking(on){$('aurora').classList.toggle('thinking',on);$('voiceStrip').classList.toggle('active',on);$('voiceStrip').classList.toggle('processing',on);}
+function playReadyChime(){try{const c=new(window.AudioContext||window.webkitAudioContext)();const o=c.createOscillator();const g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=880;o.type='sine';g.gain.value=0.08;g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+0.3);o.start();o.stop(c.currentTime+0.3);}catch(e){}}
+
+function showInterrupt(){$('interruptBtn').classList.add('show');}
+function hideInterrupt(){$('interruptBtn').classList.remove('show');}
+function onInterrupt(){stopAudio();clearCC();hideInterrupt();}
+
+async function autoListen(ut){const g=gen;setStatus('Listening...');setAvatar('listen');
+  await wait(800);if(g!==gen)return;$('waveBars').classList.add('active');setStatus('');
+  await streamCC(ut,150);if(g!==gen)return;$('waveBars').classList.remove('active');
+  await wait(500);if(g!==gen)return;clearCC();}
+
+async function showThinkingMarkers(label){const g=gen;setStatus(label||'Thinking...');setThinking(true);
+  const f=FILLERS[Math.floor(Math.random()*FILLERS.length)];streamCC(f);setAvatar('speak');
+  await speak(f,1.1);if(g!==gen)return;clearCC();setAvatar('idle');await wait(300);if(g!==gen)return;
+  playReadyChime();setThinking(false);setStatus('');}
+
+// ===== CARD + MODE MANAGEMENT =====
+function clearCards(){$('cardArea').innerHTML='';}
+function addCard(h){const t=document.createElement('template');t.innerHTML=h.trim();$('cardArea').appendChild(t.content.firstChild);$('cardArea').scrollTop=$('cardArea').scrollHeight;}
+function showCardSkel(type){const el=document.createElement('div');el.className='skeleton-dark skel-'+type;$('cardArea').appendChild(el);return el;}
+function replaceSkel(s,h){const t=document.createElement('template');t.innerHTML=h.trim();s.replaceWith(t.content.firstChild);}
+
+function setMode(mode){
+  const aa=$('avatarArea'), ca=$('cardArea');
+  aa.className='avatar-area '+mode;
+  if(mode==='large'){ca.className='card-area below-medium';ca.style.display='none';}
+  else if(mode==='medium'){ca.className='card-area below-medium';ca.style.display='flex';}
+  else{ca.className='card-area full';ca.style.display='flex';} // small = card-heavy
+}
+
+let gen=0;let sessionStart=0;let callTimerInt=null;let callSecs=0;
+const $=id=>document.getElementById(id);
+function wait(ms){return new Promise(r=>setTimeout(r,ms));}
+function setStatus(t){$('statusText').textContent=t;}
+function updateProgress(n){document.querySelectorAll('.p-seg').forEach((s,i)=>{s.classList.toggle('done',i<n-1);s.classList.toggle('now',i===n-1);});}
+
+// ===== M1 — VOICE-ONLY (large avatar, no cards) =====
+async function playM1(){
+  const g=gen;sessionStart=Date.now();updateProgress(1);
+  setMode('large');clearCards();setStatus('');setAvatar('speak');
+  $('callHeader').classList.remove('show');
+  preCache(V.m2);preCache(V.m4);
+  showInterrupt();streamCC(V.m1);await speak(V.m1);hideInterrupt();clearCC();
+  if(g!==gen)return;setAvatar('idle');await wait(600);if(g!==gen)return;playM2();}
+
+// ===== M2 — VOICE + OVERLAY CARD (medium avatar) =====
+async function playM2(){
+  const g=gen;updateProgress(2);setMode('medium');clearCards();
+  setStatus('Scenario');setAvatar('speak');preCache(V.m4f);
+  const sk=showCardSkel('scenario');
+  showInterrupt();streamCC(V.m2);await speak(V.m2);hideInterrupt();clearCC();
+  if(g!==gen)return;
+  replaceSkel(sk,'<div class="overlay-card"><div class="sc-tag">OFFICE &middot; FORMAL</div><div class="sc-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M20 7h-4V5c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zM10 5h4v2h-4V5z"/></svg></div><div class="sc-en">Introduce yourself to your new team</div><div class="sc-hint"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/></svg><span>Your name, role, and why you\'re excited</span></div></div>');
+  setAvatar('listen');setStatus('');await wait(500);if(g!==gen)return;playM3();}
+
+// ===== M3 — VOICE-ONLY (large avatar, auto-listen) =====
+async function playM3(){
+  const g=gen;updateProgress(3);setMode('large');clearCards();
+  await autoListen(U.m3);if(g!==gen)return;
+  await showThinkingMarkers('Checking grammar...');if(g!==gen)return;playM4();}
+
+// ===== M4 — VOICE + OVERLAY CARDS (medium avatar) =====
+async function playM4(){
+  const g=gen;updateProgress(4);setMode('medium');clearCards();
+  setStatus('Coach feedback');setAvatar('speak');preCache(V.m5r1);preCache(V.m5c1);
+  const sk=showCardSkel('correction');
+  showInterrupt();streamCC(V.m4);await speak(V.m4);if(g!==gen)return;clearCC();
+  replaceSkel(sk,'<div class="overlay-correction"><div class="cc-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm5.21 7.71l-6 6a1 1 0 01-1.42 0l-3-3a1 1 0 111.42-1.42l2.29 2.3 5.29-5.3a1 1 0 011.42 1.42z"/></svg> Better way</div><div class="corr-text">\u201CHi everyone, I\u2019m Rahul. I\u2019ve just joined the team today, and I\u2019m really excited to be here.\u201D</div></div>');
+  streamCC(V.m4f);await speak(V.m4f);hideInterrupt();clearCC();if(g!==gen)return;
+  addCard('<div class="overlay-fix"><div class="fix-wrong">\u2715 "I am working in this company from today"</div><div class="fix-right">\u2713 "I\u2019ve just joined the team today"</div></div>');
+  await wait(300);
+  addCard('<div class="overlay-fix"><div class="fix-wrong">\u2715 "I am very happy for joining"</div><div class="fix-right">\u2713 "I\u2019m really excited to be here"</div></div>');
+  setAvatar('idle');setStatus('');await wait(1000);if(g!==gen)return;playM5();}
+
+// ===== M5 — CARD-HEAVY (small avatar, overlay transcript panels) =====
+async function playM5(){
+  const g=gen;updateProgress(5);setMode('small');clearCards();
+  $('callHeader').classList.add('show');startCallTimer();
+  preCache(V.m5c2);preCache(V.m5r3);preCache(V.m5c3);preCache(V.m6);
+  FILLERS.forEach(f=>preCache(f,1.1));
+  $('callStat').innerHTML='<span class="dot-pulse"></span> Connecting...';
+  await wait(800);if(g!==gen)return;
+
+  for(let i=0;i<ROUNDS.length;i++){
+    const rd=ROUNDS[i];
+    $('callStat').innerHTML='<span class="dot-pulse"></span> Priya speaking...';
+    setAvatar('speak');
+    addCard('<div class="overlay-panel"><div class="ct-label">Live Transcript</div><div class="ct-name">Priya</div><div class="ct-text">'+rd.aiText+'</div></div>');
+    showInterrupt();streamCC(rd.aiVoice);await speak(rd.aiVoice);hideInterrupt();clearCC();if(g!==gen)return;
+
+    $('callStat').innerHTML='<span class="dot-pulse" style="background:var(--white)"></span> Your turn';
+    await autoListen(rd.userText);if(g!==gen)return;
+    const panels=$('cardArea').querySelectorAll('.overlay-panel');
+    const last=panels[panels.length-1];
+    if(last)last.insertAdjacentHTML('beforeend','<div class="ct-you">You said:</div><div class="ct-user">\u201C'+rd.userText+'\u201D</div>');
+
+    $('callStat').innerHTML='<span class="dot-pulse" style="background:var(--secondary)"></span> Processing...';
+    await showThinkingMarkers('Processing...');if(g!==gen)return;
+
+    let fh='<div class="overlay-fix-panel"><div class="fp-label">Quick Fix</div>';
+    rd.fixes.forEach(f=>{fh+='<div class="fp-row"><span class="fp-wrong">'+f.w+'</span><span class="fp-right">'+f.r+'</span><div class="fp-why">'+f.why+'</div></div>';});
+    fh+='</div>';addCard(fh);
+    $('callStat').innerHTML='<span class="dot-pulse"></span> Coach speaking...';
+    setAvatar('speak');showInterrupt();streamCC(rd.corrVoice);await speak(rd.corrVoice);hideInterrupt();clearCC();
+    if(g!==gen)return;if(i<ROUNDS.length-1)await wait(600);}
+
+  stopCallTimer();$('callStat').innerHTML='<span class="dot-pulse" style="background:var(--secondary)"></span> Call ended';
+  setAvatar('idle');await wait(1500);if(g!==gen)return;playM6();}
+
+function startCallTimer(){callSecs=0;if(callTimerInt)clearInterval(callTimerInt);callTimerInt=setInterval(()=>{callSecs++;$('callTime').textContent=String(Math.floor(callSecs/60)).padStart(2,'0')+':'+String(callSecs%60).padStart(2,'0');},1000);}
+function stopCallTimer(){if(callTimerInt){clearInterval(callTimerInt);callTimerInt=null;}}
+
+async function playM6(){
+  const g=gen;updateProgress(6);$('callHeader').classList.remove('show');
+  const el=Math.floor((Date.now()-sessionStart)/1000);
+  $('sumTime').textContent=Math.floor(el/60)+':'+String(el%60).padStart(2,'0');
+  $('summaryOverlay').classList.add('active');setAvatar('speak');
+  streamCC(V.m6);await speak(V.m6);clearCC();if(g!==gen)return;setAvatar('idle');}
+
+function restart(){gen++;stopAudio();clearCC();stopCallTimer();hideInterrupt();clearCards();
+  $('callHeader').classList.remove('show');$('summaryOverlay').classList.remove('active');
+  $('waveBars').classList.remove('active');setThinking(false);setStatus('');setMode('large');playM1();}
+
+document.addEventListener('click',unlockAudio,{once:true});
+document.addEventListener('touchstart',unlockAudio,{once:true});
+preCache(V.m1);preCache(V.m2);FILLERS.forEach(f=>preCache(f,1.1));
+[AV.idle,AV.speak,AV.listen].forEach(u=>{const v=document.createElement('video');v.preload='auto';v.src=u;});
+playM1();
+</script>
+</body>
+</html>

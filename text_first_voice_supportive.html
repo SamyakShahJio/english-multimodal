@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>English Sathi — Mode 3: Voice + Text</title>
+<title>English Sathi — Text First + Voice Support</title>
 <style>
 /* ===== FONTS ===== */
 @font-face { font-family: 'JioType'; font-weight: 400; font-display: swap; src: url('https://raw.githubusercontent.com/sunit1986/JioBharatIQ_Server/main/assets/fonts/woff2/JioTypeVarW05-Regular.woff2') format('woff2'); }
@@ -29,16 +29,14 @@ body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; a
 .phone-frame { width: 360px; height: 800px; border-radius: 40px; overflow: hidden; position: relative; background: var(--white); box-shadow: 0 0 0 2px rgba(0,0,0,0.08), 0 24px 80px rgba(0,0,0,0.15); flex-shrink: 0; }
 .screen { position: absolute; inset: 0; overflow: hidden; display: flex; flex-direction: column; }
 
-/* ===== NAV HEADER (always light — text leads) ===== */
+/* ===== NAV HEADER ===== */
 .nav-header { position: absolute; top: 0; left: 0; right: 0; z-index: 150; display: flex; align-items: center; gap: 12px; padding: 14px 16px 8px; color: var(--grey-80); background: var(--white); border-bottom: 1px solid rgba(0,0,0,0.04); }
 .back-btn { width: 36px; height: 36px; border-radius: 50%; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; color: inherit; flex-shrink: 0; }
 .back-btn:active { background: rgba(128,128,128,0.15); }
 .nav-title { font-size: 15px; font-weight: 700; color: var(--grey-100); }
-.mode-label { margin-left: auto; font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; padding: 3px 8px; border-radius: var(--r-pill); white-space: nowrap; background: rgba(53,53,243,0.1); color: var(--primary); }
-
-/* ===== SPEAKER TOGGLE ===== */
-.speaker-toggle { width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--grey-40); background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--primary); flex-shrink: 0; transition: all 0.2s; }
-.speaker-toggle.muted { color: var(--grey-60); border-color: var(--grey-40); opacity: 0.5; }
+.mode-label { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; padding: 3px 8px; border-radius: var(--r-pill); white-space: nowrap; background: rgba(53,53,243,0.1); color: var(--primary); }
+.speaker-toggle { width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--grey-40); background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--primary); flex-shrink: 0; transition: all 0.2s; margin-left: auto; }
+.speaker-toggle.muted { color: var(--grey-60); opacity: 0.5; }
 .speaker-toggle:active { background: var(--primary-light); }
 
 /* ===== PROGRESS ===== */
@@ -46,12 +44,6 @@ body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; a
 .p-seg { flex: 1; height: 3px; border-radius: 2px; background: rgba(128,128,128,0.2); transition: background 0.4s; }
 .p-seg.done { background: var(--primary); }
 .p-seg.now { background: var(--primary); opacity: 0.65; }
-
-/* ===== VOICE STRIP (light-themed, subtle) ===== */
-.voice-strip { position: absolute; bottom: 0; left: 0; right: 0; z-index: 250; display: flex; align-items: center; justify-content: center; gap: 2px; height: 20px; pointer-events: none; opacity: 0; transition: opacity 0.4s; background: linear-gradient(transparent, rgba(53,53,243,0.03)); }
-.voice-strip.active { opacity: 1; }
-.voice-strip span { width: 2px; border-radius: 99px; height: 3px; background: rgba(53,53,243,0.35); }
-.voice-strip.active span { animation: vsBar 0.7s ease-in-out infinite; animation-delay: calc(var(--d) * 0.04s); }
 
 /* ===== CHAT VIEW ===== */
 .chat-view { flex: 1; display: flex; flex-direction: column; padding-top: 68px; min-height: 0; overflow: hidden; }
@@ -71,22 +63,33 @@ body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; a
 .coach-dot span:nth-child(4) { background: #1eccb0; }
 .priya-av { width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-light), var(--primary)); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; color: var(--white); flex-shrink: 0; }
 .sender-name { font-size: 11px; font-weight: 700; margin-bottom: 2px; }
-.sender-name.coach { color: var(--sparkle); }
-.sender-name.priya { color: var(--primary); }
-.chat-bubble { padding: 10px 14px; font-size: 14px; line-height: 1.5; word-break: break-word; }
+.sender-name.coach-label { color: var(--sparkle); }
+.sender-name.priya-label { color: var(--primary); }
+.bubble-wrap { position: relative; }
+.chat-bubble { padding: 10px 14px; font-size: 14px; line-height: 1.5; word-break: break-word; min-height: 20px; transition: box-shadow 0.3s; }
 .chat-msg.coach .chat-bubble { background: var(--surface-ghost); color: var(--grey-100); border-radius: 4px 16px 16px 16px; }
 .chat-msg.user .chat-bubble { background: var(--primary); color: var(--white); border-radius: 16px 4px 16px 16px; }
+.chat-bubble.speaking { box-shadow: 0 0 0 2px rgba(53,53,243,0.3); }
 
-/* Speaking indicator on bubble */
-.chat-bubble.speaking { box-shadow: 0 0 0 2px rgba(53,53,243,0.25); }
+/* ===== PER-MESSAGE SPEAKER ICON ===== */
+.msg-speaker { width: 22px; height: 22px; border-radius: 50%; border: none; background: transparent; color: var(--grey-60); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; margin-top: 4px; opacity: 0.4; transition: all 0.2s; }
+.msg-speaker:hover, .msg-speaker:active, .msg-speaker.playing { opacity: 1; color: var(--primary); }
 
 /* ===== TYPING INDICATOR ===== */
 .typing-row { display: flex; gap: 8px; align-self: flex-start; padding: 4px 0; animation: msgIn 0.2s ease-out; }
-.typing-bubble { display: flex; gap: 5px; align-items: center; padding: 12px 18px; background: var(--surface-ghost); border-radius: 4px 16px 16px 16px; }
-.typing-bubble span { width: 6px; height: 6px; border-radius: 50%; background: var(--grey-60); display: inline-block; }
-.typing-bubble span:nth-child(1) { animation: typingBounce 1.2s ease-in-out infinite 0s; }
-.typing-bubble span:nth-child(2) { animation: typingBounce 1.2s ease-in-out infinite 0.15s; }
-.typing-bubble span:nth-child(3) { animation: typingBounce 1.2s ease-in-out infinite 0.3s; }
+.typing-bubble { display: flex; flex-direction: column; gap: 4px; padding: 10px 18px; background: var(--surface-ghost); border-radius: 4px 16px 16px 16px; }
+.typing-dots { display: flex; gap: 5px; align-items: center; }
+.typing-dots span { width: 6px; height: 6px; border-radius: 50%; background: var(--grey-60); display: inline-block; }
+.typing-dots span:nth-child(1) { animation: typingBounce 1.2s ease-in-out infinite 0s; }
+.typing-dots span:nth-child(2) { animation: typingBounce 1.2s ease-in-out infinite 0.15s; }
+.typing-dots span:nth-child(3) { animation: typingBounce 1.2s ease-in-out infinite 0.3s; }
+.typing-context { font-size: 11px; color: var(--grey-60); font-weight: 500; font-style: italic; }
+
+/* ===== SKELETON CARDS ===== */
+.skeleton { border-radius: var(--r-lg); background: linear-gradient(90deg, var(--grey-20) 25%, #e8e8e8 50%, var(--grey-20) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; max-width: 92%; align-self: flex-start; margin: 4px 0; }
+.skeleton-scenario { height: 160px; width: 100%; }
+.skeleton-correction { height: 80px; width: 100%; }
+.skeleton-fix { height: 52px; width: 90%; }
 
 /* ===== INLINE CARDS ===== */
 .chat-card { max-width: 92%; align-self: flex-start; animation: msgIn 0.3s ease-out; margin: 4px 0; }
@@ -96,25 +99,20 @@ body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; a
 .sc-en { font-size: 16px; font-weight: 900; color: var(--grey-100); line-height: 1.3; margin-bottom: 8px; }
 .sc-hint { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--grey-60); background: var(--grey-20); padding: 8px 12px; border-radius: var(--r-sm); text-align: left; }
 .sc-hint svg { flex-shrink: 0; color: var(--secondary); }
-
 .correct-card-inline { background: var(--grey-100); border-radius: var(--r-lg); padding: 16px; color: var(--white); max-width: 92%; align-self: flex-start; animation: msgIn 0.3s ease-out; margin: 4px 0; }
 .cc-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--sparkle); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
-.cc-text { font-size: 15px; font-weight: 700; line-height: 1.4; }
-
-.fix-card-inline { background: var(--white); border: 1.5px solid var(--grey-40); border-radius: var(--r-md); padding: 12px 14px; max-width: 92%; align-self: flex-start; animation: msgIn 0.3s ease-out; margin: 3px 0; }
-.fix-wrong { font-size: 12px; color: var(--error); font-weight: 700; margin-bottom: 3px; }
-.fix-right { font-size: 12px; color: var(--success); font-weight: 700; }
-.fix-why { font-size: 11px; color: var(--grey-60); margin-top: 4px; line-height: 1.3; }
-
+.corr-text { font-size: 15px; font-weight: 700; line-height: 1.4; }
 .fix-panel-inline { background: var(--grey-20); border-left: 3px solid var(--secondary); border-radius: 4px var(--r-md) var(--r-md) 4px; padding: 12px 14px; max-width: 92%; align-self: flex-start; animation: msgIn 0.3s ease-out; margin: 4px 0; }
 .fp-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--secondary); margin-bottom: 8px; }
 .fp-row { margin-bottom: 6px; }
-.fp-row:last-child { margin-bottom: 0; }
 .fp-wrong { font-size: 12px; color: var(--error); font-weight: 600; text-decoration: line-through; }
 .fp-right { font-size: 12px; color: var(--success); font-weight: 700; margin-left: 6px; }
 .fp-why { font-size: 11px; color: var(--grey-60); margin-top: 2px; }
+.fix-card-inline { background: var(--white); border: 1.5px solid var(--grey-40); border-radius: var(--r-md); padding: 12px 14px; max-width: 92%; align-self: flex-start; animation: msgIn 0.3s ease-out; margin: 3px 0; }
+.fix-wrong { font-size: 12px; color: var(--error); font-weight: 700; margin-bottom: 3px; }
+.fix-right { font-size: 12px; color: var(--success); font-weight: 700; }
 
-/* ===== CHAT DIVIDER ===== */
+/* ===== DIVIDER ===== */
 .chat-divider { display: flex; align-items: center; gap: 10px; padding: 14px 0 8px; align-self: center; }
 .chat-divider::before, .chat-divider::after { content: ''; height: 1px; background: var(--grey-40); width: 40px; }
 .chat-divider span { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--grey-60); white-space: nowrap; }
@@ -122,19 +120,24 @@ body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; a
 /* ===== CHIPS ===== */
 .chip-row { display: flex; flex-wrap: wrap; gap: 8px; padding: 4px 16px; min-height: 0; }
 .chip-row:empty { display: none; padding: 0; }
-.chip { padding: 9px 16px; border-radius: var(--r-pill); border: 1.5px solid var(--primary); background: var(--white); color: var(--primary); font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'JioType'; transition: all 0.2s; animation: msgIn 0.3s ease-out; max-width: calc(100% - 8px); text-align: left; line-height: 1.3; }
+.chip { padding: 9px 16px; border-radius: var(--r-pill); border: 1.5px solid var(--primary); background: var(--white); color: var(--primary); font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'JioType'; transition: all 0.2s; animation: msgIn 0.3s ease-out; }
 .chip:active { background: var(--primary-light); }
 .chip.fill { background: var(--primary); color: var(--white); border-color: var(--primary); }
-.chip.fill:active { opacity: 0.85; }
 
-/* ===== INPUT BAR (text + mic — voice supports text) ===== */
+/* ===== INPUT BAR ===== */
 .chat-input-area { flex-shrink: 0; background: var(--white); border-top: 1px solid rgba(0,0,0,0.06); }
 .text-input-bar { display: flex; align-items: center; gap: 8px; padding: 8px 16px 28px; }
 .text-field { flex: 1; padding: 10px 16px; border-radius: var(--r-pill); border: 1.5px solid var(--grey-40); background: var(--surface-ghost); font-size: 14px; font-family: 'JioType'; outline: none; color: var(--grey-100); transition: border-color 0.2s; }
 .text-field::placeholder { color: var(--grey-60); }
 .text-field:focus { border-color: var(--primary); }
-.send-btn { width: 40px; height: 40px; border-radius: 50%; border: none; background: var(--primary); color: var(--white); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; }
+.send-btn { width: 40px; height: 40px; border-radius: 50%; border: none; background: var(--primary); color: var(--white); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .send-btn:active { transform: scale(0.9); }
+
+/* ===== VOICE STRIP (light-themed) ===== */
+.voice-strip { position: absolute; bottom: 0; left: 0; right: 0; z-index: 250; display: flex; align-items: center; justify-content: center; gap: 2px; height: 20px; pointer-events: none; opacity: 0; transition: opacity 0.4s; background: linear-gradient(transparent, rgba(53,53,243,0.03)); }
+.voice-strip.active { opacity: 1; }
+.voice-strip span { width: 2px; border-radius: 99px; height: 3px; background: rgba(53,53,243,0.35); }
+.voice-strip.active span { animation: vsBar 0.7s ease-in-out infinite; animation-delay: calc(var(--d) * 0.04s); }
 
 /* ===== M6 SUMMARY ===== */
 .moment { position: absolute; inset: 0; display: flex; flex-direction: column; opacity: 0; pointer-events: none; }
@@ -161,17 +164,15 @@ body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; a
 .sp-item:last-child { border-bottom: none; }
 .m6-actions { display: flex; gap: 10px; }
 .btn-fill { flex: 1; padding: 14px; border-radius: var(--r-pill); border: none; background: var(--primary); color: var(--white); font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'JioType'; }
-.btn-fill:active { opacity: 0.85; }
 .btn-ghost { flex: 1; padding: 14px; border-radius: var(--r-pill); border: 1.5px solid var(--primary); background: transparent; color: var(--primary); font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'JioType'; }
-.btn-ghost:active { background: var(--primary-light); }
 
 /* ===== ANIMATIONS ===== */
 @keyframes msgIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes typingBounce { 0%, 100% { transform: translateY(0); opacity: 0.4; } 50% { transform: translateY(-4px); opacity: 1; } }
 @keyframes momentIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 @keyframes vsBar { 0%, 100% { height: 3px; opacity: 0.3; } 50% { height: 12px; opacity: 0.7; } }
 
-/* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
   body { background: #fff !important; padding: 0 !important; }
   .phone-frame { width: 100% !important; height: 100vh !important; height: 100dvh !important; border-radius: 0 !important; box-shadow: none !important; max-width: 100% !important; }
@@ -182,49 +183,38 @@ body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; a
 
 <div class="phone-frame">
   <div class="screen">
-    <!-- Nav Header -->
-    <div class="nav-header" id="navHeader">
+    <div class="nav-header">
       <button class="back-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19 11H7.83l4.88-4.88a1.008 1.008 0 00-1.42-1.42l-6.59 6.59a1 1 0 000 1.42l6.59 6.59a1.002 1.002 0 001.639-.325 1 1 0 00-.22-1.095L7.83 13H19a1 1 0 000-2z"/></svg></button>
       <span class="nav-title">English Sathi</span>
-      <span class="mode-label">Mode 3 &middot; Voice + Text</span>
+      <span class="mode-label">Text First</span>
       <button class="speaker-toggle" id="speakerBtn" onclick="toggleMute()">
         <svg id="speakerIcon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0014 8.5v7a4.47 4.47 0 002.5-3.5zM14 3.23v2.06a6.51 6.51 0 010 13.42v2.06A8.5 8.5 0 0014 3.23z"/></svg>
       </button>
     </div>
 
-    <!-- Progress -->
     <div class="progress" id="progress">
       <div class="p-seg now"></div><div class="p-seg"></div><div class="p-seg"></div>
       <div class="p-seg"></div><div class="p-seg"></div><div class="p-seg"></div>
     </div>
 
-    <!-- Chat View -->
     <div class="chat-view" id="chatView">
       <div class="chat-container" id="chat"></div>
-      <div class="chat-input-area" id="inputArea">
+      <div class="chat-input-area">
         <div id="chipRow" class="chip-row"></div>
         <div class="text-input-bar">
           <input type="text" class="text-field" id="chatField" placeholder="Type your response..." onkeydown="if(event.key==='Enter')onSend()">
-          <button class="send-btn" onclick="onSend()">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-          </button>
+          <button class="send-btn" onclick="onSend()"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>
         </div>
       </div>
     </div>
 
-    <!-- Voice Strip (light-themed) -->
     <div class="voice-strip" id="voiceStrip">
-      <span style="--d:0"></span><span style="--d:1"></span><span style="--d:2"></span>
-      <span style="--d:3"></span><span style="--d:4"></span><span style="--d:5"></span>
-      <span style="--d:6"></span><span style="--d:7"></span><span style="--d:8"></span>
-      <span style="--d:9"></span><span style="--d:10"></span><span style="--d:11"></span>
-      <span style="--d:12"></span><span style="--d:13"></span><span style="--d:14"></span>
-      <span style="--d:15"></span><span style="--d:16"></span><span style="--d:17"></span>
-      <span style="--d:18"></span><span style="--d:19"></span><span style="--d:20"></span>
-      <span style="--d:21"></span><span style="--d:22"></span><span style="--d:23"></span>
+      <span style="--d:0"></span><span style="--d:1"></span><span style="--d:2"></span><span style="--d:3"></span><span style="--d:4"></span><span style="--d:5"></span>
+      <span style="--d:6"></span><span style="--d:7"></span><span style="--d:8"></span><span style="--d:9"></span><span style="--d:10"></span><span style="--d:11"></span>
+      <span style="--d:12"></span><span style="--d:13"></span><span style="--d:14"></span><span style="--d:15"></span><span style="--d:16"></span><span style="--d:17"></span>
+      <span style="--d:18"></span><span style="--d:19"></span><span style="--d:20"></span><span style="--d:21"></span><span style="--d:22"></span><span style="--d:23"></span>
     </div>
 
-    <!-- M6: Summary -->
     <section class="moment" id="m6">
       <div class="m6-scroll">
         <div class="sum-hero">
@@ -245,10 +235,8 @@ body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; a
           <div class="sf-row"><span class="sf-wrong">"good peoples"</span><span class="sf-arrow">&rarr;</span><span class="sf-right">"great people"</span></div>
         </div>
         <div class="sum-section"><h3>Phrases Learned</h3>
-          <div class="sp-item">"I've just joined the team"</div>
-          <div class="sp-item">"I'm really excited to be here"</div>
-          <div class="sp-item">"I was working at an IT company"</div>
-          <div class="sp-item">"developing software for banks"</div>
+          <div class="sp-item">"I've just joined the team"</div><div class="sp-item">"I'm really excited to be here"</div>
+          <div class="sp-item">"I was working at an IT company"</div><div class="sp-item">"developing software for banks"</div>
           <div class="sp-item">"looking forward to learning"</div>
         </div>
         <div class="m6-actions">
@@ -266,66 +254,51 @@ const API_KEY = 'sk_86a2daf2318ba84afa5190ff9a2c09fcc9e7f9dafea1fe79';
 const VOICE_ID = 'FaqthkZu1EWxXxUFbAfb';
 const TTS_URL = `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`;
 
-// ===== VOICE TEXTS (what the voice says — can differ from screen text) =====
+// ===== CONTENT =====
 const V = {
   m1a: "Namaste! Main tumhara English learning saathi hoon.",
-  m1b: "Aaj hum ek situation ke liye practice karenge. Socho ki tum ek new office mein apna introduction de rahe ho.",
-  m2: "Imagine you have just joined a new company. Your manager asks you to introduce yourself to the team. Try saying it in English.",
-  m4: "Great attempt! Here is a more natural way to say it. Hi everyone, I am Rahul. I have just joined the team today, and I am really excited to be here.",
-  m5r1: "Now let us practice! I will be your colleague Priya. Hey Rahul, nice to meet you! So what were you doing before joining us?",
-  m5c1: "Good! Small fix. Say, I was working at an IT company in Pune, instead of doing job in Pune. Working at sounds much more professional.",
-  m5r2: "That sounds interesting! What kind of projects were you working on there?",
-  m5c2: "Nice! Say developing software, not making software. And it is very interesting, not very much interesting.",
-  m5r3: "Great! What are you most looking forward to in this new role?",
-  m5c3: "Almost perfect! Say looking forward to, not looking forward for. And remember, people is already plural. You do not need to add an S.",
-  m6: "Bahut achha, Rahul! Aaj tumne teen important cheezein seekhi. Pehli, I have just joined use karo recent actions ke liye. Doosri, working at bolo, doing job nahi. Aur teesri, people already plural hai. Keep practicing!"
+  m1b: "Aaj hum ek situation ke liye practice karenge.",
+  m2: "Imagine you have just joined a new company. Your manager asks you to introduce yourself.",
+  m4: "Great attempt! Here is a more natural way to say it.",
+  m5r1: "Hey Rahul, nice to meet you! So what were you doing before joining us?",
+  m5c1: "Good! Say, I was working at an IT company in Pune, instead of doing job in Pune.",
+  m5r2: "What kind of projects were you working on there?",
+  m5c2: "Nice! Say developing software, not making software.",
+  m5r3: "What are you most looking forward to in this new role?",
+  m5c3: "Say looking forward to, not looking forward for. People is already plural.",
+  m6: "Bahut achha, Rahul! Keep practicing!"
 };
-
 const U = {
   m3: "Hello, I am Rahul. I am working in this company from today. I am very happy for joining.",
   r1: "Before this I was doing job in Pune in a IT company.",
   r2: "I was making software for banks. It was very much interesting work.",
   r3: "I am looking forward for learning new things and meeting good peoples."
 };
-
 const ROUNDS = [
-  { aiText: "Hey Rahul, nice to meet you! So what were you doing before joining us?",
-    aiVoice: V.m5r1, corrVoice: V.m5c1, userText: U.r1,
-    fixes: [{ w: '"doing job in Pune"', r: '"working at a company in Pune"', why: '"Working at" is the standard way to describe employment' },
-            { w: '"a IT company"', r: '"an IT company"', why: 'Use "an" before vowel sounds' }] },
-  { aiText: "What kind of projects were you working on there?",
-    aiVoice: V.m5r2, corrVoice: V.m5c2, userText: U.r2,
-    fixes: [{ w: '"making software"', r: '"developing software"', why: '"Develop" is the professional term in tech' },
-            { w: '"very much interesting"', r: '"very interesting"', why: 'No "much" needed with "very"' }] },
-  { aiText: "What are you most looking forward to in this new role?",
-    aiVoice: V.m5r3, corrVoice: V.m5c3, userText: U.r3,
-    fixes: [{ w: '"looking forward for"', r: '"looking forward to"', why: '"Look forward to" + gerund' },
-            { w: '"good peoples"', r: '"great people"', why: '"People" is already plural' }] }
+  { aiText: "Hey Rahul, nice to meet you! So what were you doing before joining us?", aiVoice: V.m5r1, corrVoice: V.m5c1, userText: U.r1,
+    fixes: [{ w: '"doing job in Pune"', r: '"working at a company"', why: '"Working at" is standard' }, { w: '"a IT company"', r: '"an IT company"', why: 'Use "an" before vowel sounds' }] },
+  { aiText: "What kind of projects were you working on there?", aiVoice: V.m5r2, corrVoice: V.m5c2, userText: U.r2,
+    fixes: [{ w: '"making software"', r: '"developing software"', why: '"Develop" is professional' }, { w: '"very much interesting"', r: '"very interesting"', why: 'No "much" needed' }] },
+  { aiText: "What are you most looking forward to in this new role?", aiVoice: V.m5r3, corrVoice: V.m5c3, userText: U.r3,
+    fixes: [{ w: '"looking forward for"', r: '"looking forward to"', why: '"Look forward to" + gerund' }, { w: '"good peoples"', r: '"great people"', why: '"People" is already plural' }] }
 ];
 
 // ===== STATE =====
 let gen = 0; let sessionStart = 0; let pendingResolve = null; let pendingUserText = null;
 let muted = false; let currentAudio = null; let audioCtx = null; let activeBubble = null;
 const ttsCache = new Map();
-
-// ===== HELPERS =====
 const $ = id => document.getElementById(id);
 function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
-function scroll() { const c = $('chat'); c.scrollTop = c.scrollHeight; }
+function scroll() { $('chat').scrollTop = $('chat').scrollHeight; }
 function updateProgress(n) { document.querySelectorAll('.p-seg').forEach((s, i) => { s.classList.toggle('done', i < n - 1); s.classList.toggle('now', i === n - 1); }); }
 
-// ===== TTS ENGINE (voice as supporting actor) =====
+// ===== AUDIO ENGINE =====
 function unlockAudio() { try { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if (audioCtx.state === 'suspended') audioCtx.resume(); } catch(e) {} }
-function stopAudio() { if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; currentAudio = null; } speechSynthesis.cancel(); setVoiceActive(false); }
-
-function setVoiceActive(on) {
-  $('voiceStrip').classList.toggle('active', on);
-  if (!on && activeBubble) { activeBubble.classList.remove('speaking'); activeBubble = null; }
-}
+function stopAudio() { if (currentAudio) { const r = currentAudio._resolve; currentAudio.pause(); currentAudio.currentTime = 0; currentAudio = null; if (r) r(); } speechSynthesis.cancel(); setVoiceActive(false); }
+function setVoiceActive(on) { $('voiceStrip').classList.toggle('active', on); if (!on && activeBubble) { activeBubble.classList.remove('speaking'); activeBubble = null; } }
 
 function toggleMute() {
-  muted = !muted;
-  $('speakerBtn').classList.toggle('muted', muted);
+  muted = !muted; $('speakerBtn').classList.toggle('muted', muted);
   $('speakerIcon').innerHTML = muted
     ? '<path d="M16.5 12A4.5 4.5 0 0014 8.5v2.09l2.5 2.5V12zM19 12c0 .94-.2 1.82-.54 2.64l1.51 1.51A8.5 8.5 0 0019 3.23v2.06c2.89.86 5 3.54 5 6.71 0 1.7-.56 3.27-1.49 4.54l-1.53-1.53c.63-.97 1.02-2.11 1.02-3.01zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06a8.46 8.46 0 003.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>'
     : '<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0014 8.5v7a4.47 4.47 0 002.5-3.5zM14 3.23v2.06a6.51 6.51 0 010 13.42v2.06A8.5 8.5 0 0014 3.23z"/>';
@@ -335,122 +308,107 @@ function toggleMute() {
 function speak(text, pace) {
   if (muted) return Promise.resolve();
   pace = pace || 1.0;
-  return new Promise(async (resolve) => {
-    unlockAudio(); stopAudio();
-    const key = text + '|' + pace;
+  return new Promise(async (resolve) => { unlockAudio(); stopAudio(); const key = text + '|' + pace;
     if (ttsCache.has(key)) { playUrl(ttsCache.get(key), resolve); return; }
-    try {
-      const res = await fetch(TTS_URL, { method: 'POST', headers: { 'xi-api-key': API_KEY, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, model_id: 'eleven_turbo_v2_5', voice_settings: { stability: 0.5, similarity_boost: 0.75, speed: pace } }) });
-      if (!res.ok) throw new Error('TTS ' + res.status);
-      const blob = await res.blob(); const url = URL.createObjectURL(blob); ttsCache.set(key, url); playUrl(url, resolve);
-    } catch(e) { console.warn('TTS fallback:', e); setVoiceActive(true); browserTTS(text, pace < 0.8 ? 0.65 : 0.85); const dur = Math.min(text.length * 65, 8000); setTimeout(() => { setVoiceActive(false); resolve(); }, dur); }
-  });
+    try { const res = await fetch(TTS_URL, { method: 'POST', headers: { 'xi-api-key': API_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, model_id: 'eleven_turbo_v2_5', voice_settings: { stability: 0.5, similarity_boost: 0.75, speed: pace } }) });
+      if (!res.ok) throw new Error('TTS'); const blob = await res.blob(); const url = URL.createObjectURL(blob); ttsCache.set(key, url); playUrl(url, resolve);
+    } catch(e) { setVoiceActive(true); browserTTS(text, 0.85); setTimeout(() => { setVoiceActive(false); resolve(); }, Math.min(text.length * 65, 8000)); } });
 }
-function playUrl(url, onend) { const a = new Audio(url); currentAudio = a; setVoiceActive(true); a.onended = () => { setVoiceActive(false); if (onend) onend(); }; a.onerror = () => { setVoiceActive(false); if (onend) onend(); }; a.play().catch(() => { setVoiceActive(false); if (onend) setTimeout(onend, 500); }); }
-function browserTTS(text, rate) { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text); u.lang = 'en-US'; u.rate = rate || 0.85; speechSynthesis.speak(u); }
+function playUrl(url, onend) { const a = new Audio(url); currentAudio = a; a._resolve = onend; setVoiceActive(true);
+  a.onended = () => { setVoiceActive(false); currentAudio = null; if (onend) onend(); };
+  a.onerror = () => { setVoiceActive(false); currentAudio = null; if (onend) onend(); };
+  a.play().catch(() => { setVoiceActive(false); currentAudio = null; if (onend) setTimeout(onend, 500); }); }
+function browserTTS(t, r) { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(t); u.lang = 'en-US'; u.rate = r || 0.85; speechSynthesis.speak(u); }
 function preCache(text, pace) { pace = pace || 1.0; const key = text + '|' + pace; if (ttsCache.has(key)) return;
   fetch(TTS_URL, { method: 'POST', headers: { 'xi-api-key': API_KEY, 'Content-Type': 'application/json' },
     body: JSON.stringify({ text, model_id: 'eleven_turbo_v2_5', voice_settings: { stability: 0.5, similarity_boost: 0.75, speed: pace } })
   }).then(r => r.blob()).then(b => { ttsCache.set(key, URL.createObjectURL(b)); }).catch(() => {}); }
 
-// ===== CHAT PRIMITIVES (text appears first, then voice narrates) =====
-function showTyping(who) {
-  hideTyping();
-  const c = $('chat');
-  const row = document.createElement('div');
-  row.className = 'typing-row'; row.id = 'typingEl';
-  const av = who === 'priya'
-    ? '<div class="chat-avatar"><div class="priya-av">P</div></div>'
-    : '<div class="chat-avatar"><div class="coach-dot"><span></span><span></span><span></span><span></span></div></div>';
-  row.innerHTML = av + '<div class="typing-bubble"><span></span><span></span><span></span></div>';
-  c.appendChild(row); scroll();
-}
+// ===== PROGRESSIVE TEXT STREAMING =====
+function streamText(el, text, ms) { ms = ms || 80; const words = text.split(/\s+/); el.textContent = ''; let i = 0;
+  return new Promise(resolve => { const timer = setInterval(() => { if (i >= words.length) { clearInterval(timer); resolve(); return; } el.textContent += (i > 0 ? ' ' : '') + words[i]; scroll(); i++; }, ms); }); }
+
+// ===== SKELETON =====
+function showSkeleton(type) { const el = document.createElement('div'); el.className = 'skeleton skeleton-' + type; $('chat').appendChild(el); scroll(); return el; }
+function replaceSkeleton(skel, html) { const t = document.createElement('template'); t.innerHTML = html.trim(); skel.replaceWith(t.content.firstChild); scroll(); }
+
+// ===== CHAT PRIMITIVES =====
+function showTyping(who, ctx) { hideTyping(); const c = $('chat'); const row = document.createElement('div'); row.className = 'typing-row'; row.id = 'typingEl';
+  const av = who === 'priya' ? '<div class="chat-avatar"><div class="priya-av">P</div></div>' : '<div class="chat-avatar"><div class="coach-dot"><span></span><span></span><span></span><span></span></div></div>';
+  row.innerHTML = av + '<div class="typing-bubble"><div class="typing-dots"><span></span><span></span><span></span></div>' + (ctx ? '<div class="typing-context">' + ctx + '</div>' : '') + '</div>';
+  c.appendChild(row); scroll(); }
 function hideTyping() { const el = $('typingEl'); if (el) el.remove(); }
 
-// Show bubble, THEN voice reads it aloud
+// Text appears first, THEN voice narrates + speaker icon for replay
 function coachMsg(text, voiceText) {
-  return new Promise(resolve => {
+  return new Promise(async resolve => {
     const g = gen; showTyping('coach');
-    const delay = Math.min(500 + text.length * 8, 1500);
-    setTimeout(async () => {
-      if (g !== gen) { hideTyping(); resolve(); return; }
-      hideTyping();
-      const msg = document.createElement('div'); msg.className = 'chat-msg coach';
-      msg.innerHTML = '<div class="chat-avatar"><div class="coach-dot"><span></span><span></span><span></span><span></span></div></div>'
-        + '<div><div class="sender-name coach">English Sathi</div><div class="chat-bubble">' + text + '</div></div>';
-      $('chat').appendChild(msg); scroll();
-      const bubble = msg.querySelector('.chat-bubble');
-      if (!muted && voiceText) {
-        activeBubble = bubble; bubble.classList.add('speaking');
-        await speak(voiceText);
-      }
-      resolve();
-    }, delay);
+    await wait(Math.min(600 + text.length * 5, 1500));
+    if (g !== gen) { hideTyping(); resolve(); return; }
+    hideTyping();
+    const msg = document.createElement('div'); msg.className = 'chat-msg coach';
+    msg.innerHTML = '<div class="chat-avatar"><div class="coach-dot"><span></span><span></span><span></span><span></span></div></div>'
+      + '<div><div class="sender-name coach-label">English Sathi</div><div class="bubble-wrap"><div class="chat-bubble"></div></div></div>';
+    $('chat').appendChild(msg);
+    const bubble = msg.querySelector('.chat-bubble');
+    const wrap = msg.querySelector('.bubble-wrap');
+    // Stream text into bubble
+    await streamText(bubble, text);
+    if (g !== gen) { resolve(); return; }
+    // Add per-message speaker icon
+    if (voiceText) {
+      const btn = document.createElement('button'); btn.className = 'msg-speaker'; btn.dataset.voice = voiceText;
+      btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0014 8.5v7a4.47 4.47 0 002.5-3.5z"/></svg>';
+      btn.onclick = () => { stopAudio(); activeBubble = bubble; bubble.classList.add('speaking'); speak(voiceText); };
+      wrap.appendChild(btn);
+    }
+    // Auto-narrate if not muted
+    if (!muted && voiceText) { activeBubble = bubble; bubble.classList.add('speaking'); await speak(voiceText); }
+    resolve();
   });
 }
 
 function priyaMsg(text, voiceText) {
-  return new Promise(resolve => {
-    const g = gen; showTyping('priya');
-    const delay = Math.min(500 + text.length * 8, 1500);
-    setTimeout(async () => {
-      if (g !== gen) { hideTyping(); resolve(); return; }
-      hideTyping();
-      const msg = document.createElement('div'); msg.className = 'chat-msg coach';
-      msg.innerHTML = '<div class="chat-avatar"><div class="priya-av">P</div></div>'
-        + '<div><div class="sender-name priya">Priya</div><div class="chat-bubble">' + text + '</div></div>';
-      $('chat').appendChild(msg); scroll();
-      const bubble = msg.querySelector('.chat-bubble');
-      if (!muted && voiceText) {
-        activeBubble = bubble; bubble.classList.add('speaking');
-        await speak(voiceText);
-      }
-      resolve();
-    }, delay);
+  return new Promise(async resolve => {
+    const g = gen; showTyping('priya', 'Priya is typing...');
+    await wait(Math.min(600 + text.length * 5, 1500));
+    if (g !== gen) { hideTyping(); resolve(); return; }
+    hideTyping();
+    const msg = document.createElement('div'); msg.className = 'chat-msg coach';
+    msg.innerHTML = '<div class="chat-avatar"><div class="priya-av">P</div></div>'
+      + '<div><div class="sender-name priya-label">Priya</div><div class="bubble-wrap"><div class="chat-bubble"></div></div></div>';
+    $('chat').appendChild(msg);
+    const bubble = msg.querySelector('.chat-bubble');
+    const wrap = msg.querySelector('.bubble-wrap');
+    await streamText(bubble, text);
+    if (g !== gen) { resolve(); return; }
+    if (voiceText) {
+      const btn = document.createElement('button'); btn.className = 'msg-speaker'; btn.dataset.voice = voiceText;
+      btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0014 8.5v7a4.47 4.47 0 002.5-3.5z"/></svg>';
+      btn.onclick = () => { stopAudio(); activeBubble = bubble; bubble.classList.add('speaking'); speak(voiceText); };
+      wrap.appendChild(btn);
+    }
+    if (!muted && voiceText) { activeBubble = bubble; bubble.classList.add('speaking'); await speak(voiceText); }
+    resolve();
   });
 }
 
-function userMsg(text) {
-  const msg = document.createElement('div'); msg.className = 'chat-msg user';
-  msg.innerHTML = '<div class="chat-bubble">\u201C' + text + '\u201D</div>';
-  $('chat').appendChild(msg); scroll();
-}
-
-function addEl(html) {
-  const c = $('chat'); const t = document.createElement('template'); t.innerHTML = html.trim();
-  c.appendChild(t.content.firstChild); scroll();
-}
-
-function divider(text) {
-  addEl('<div class="chat-divider"><span>' + text + '</span></div>');
-}
-
-function showChip(label, fill, fn) {
-  const row = $('chipRow'); row.innerHTML = '';
+function userMsg(text) { const msg = document.createElement('div'); msg.className = 'chat-msg user';
+  msg.innerHTML = '<div class="chat-bubble">\u201C' + text + '\u201D</div>'; $('chat').appendChild(msg); scroll(); }
+function addEl(html) { const t = document.createElement('template'); t.innerHTML = html.trim(); $('chat').appendChild(t.content.firstChild); scroll(); }
+function divider(text) { addEl('<div class="chat-divider"><span>' + text + '</span></div>'); }
+function showChip(label, fill, fn) { const row = $('chipRow'); row.innerHTML = '';
   const b = document.createElement('button'); b.className = 'chip' + (fill ? ' fill' : ''); b.textContent = label;
-  b.onclick = () => { row.innerHTML = ''; fn(); };
-  row.appendChild(b); scroll();
-}
+  b.onclick = () => { row.innerHTML = ''; fn(); }; row.appendChild(b); scroll(); }
+function waitForUser(text) { return new Promise(resolve => { pendingUserText = text; pendingResolve = resolve;
+  const row = $('chipRow'); row.innerHTML = ''; const label = text.length > 50 ? text.substring(0, 48) + '...' : text;
+  const b = document.createElement('button'); b.className = 'chip'; b.textContent = label;
+  b.onclick = () => { row.innerHTML = ''; userMsg(text); pendingResolve = null; pendingUserText = null; resolve(); }; row.appendChild(b); scroll(); }); }
+function onSend() { $('chatField').value = '';
+  if (pendingResolve) { userMsg(pendingUserText); const r = pendingResolve; pendingResolve = null; pendingUserText = null; $('chipRow').innerHTML = ''; r(); } }
 
-function waitForUser(text) {
-  return new Promise(resolve => {
-    pendingUserText = text; pendingResolve = resolve;
-    const row = $('chipRow'); row.innerHTML = '';
-    const label = text.length > 50 ? text.substring(0, 48) + '...' : text;
-    const b = document.createElement('button'); b.className = 'chip'; b.textContent = label;
-    b.onclick = () => { row.innerHTML = ''; userMsg(text); pendingResolve = null; pendingUserText = null; resolve(); };
-    row.appendChild(b); scroll();
-  });
-}
-
-function onSend() {
-  const field = $('chatField'); field.value = '';
-  if (pendingResolve) { userMsg(pendingUserText); const r = pendingResolve; pendingResolve = null; pendingUserText = null; $('chipRow').innerHTML = ''; r(); }
-}
-
-// ===== FLOW (text leads, voice narrates alongside) =====
-
+// ===== FLOW =====
 async function playM1() {
   const g = gen; sessionStart = Date.now(); updateProgress(1);
   preCache(V.m1b); preCache(V.m2);
@@ -462,29 +420,28 @@ async function playM1() {
 }
 
 async function playM2() {
-  const g = gen; updateProgress(2);
-  preCache(V.m4);
-  addEl('<div class="chat-card"><div class="scenario-card-inline"><div class="sc-tag">OFFICE &middot; FORMAL</div><div class="sc-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M20 7h-4V5c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zM10 5h4v2h-4V5z"/></svg></div><div class="sc-en">Introduce yourself to your new team</div><div class="sc-hint"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/></svg><span>Think about: your name, role, and why you\'re excited</span></div></div></div>');
+  const g = gen; updateProgress(2); preCache(V.m4);
+  const skel = showSkeleton('scenario');
+  await wait(700); if (g !== gen) return;
+  replaceSkeleton(skel, '<div class="chat-card"><div class="scenario-card-inline"><div class="sc-tag">OFFICE &middot; FORMAL</div><div class="sc-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M20 7h-4V5c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zM10 5h4v2h-4V5z"/></svg></div><div class="sc-en">Introduce yourself to your new team</div><div class="sc-hint"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/></svg><span>Your name, role, and why you\'re excited</span></div></div></div>');
   await wait(300); if (g !== gen) return;
   await coachMsg('Try it in English! How would you introduce yourself?', V.m2);
   if (g !== gen) return;
   await waitForUser(U.m3);
   if (g !== gen) return;
-  updateProgress(3);
-  await wait(400);
-  playM4();
+  updateProgress(3); await wait(300); playM4();
 }
 
 async function playM4() {
-  const g = gen; updateProgress(4);
-  preCache(V.m5r1); preCache(V.m5c1);
-  addEl('<div class="correct-card-inline"><div class="cc-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm5.21 7.71l-6 6a1 1 0 01-1.42 0l-3-3a1 1 0 111.42-1.42l2.29 2.3 5.29-5.3a1 1 0 011.42 1.42z"/></svg> Better way to say it</div><div class="cc-text">\u201CHi everyone, I\u2019m Rahul. I\u2019ve just joined the team today, and I\u2019m really excited to be here.\u201D</div></div>');
-  // Voice reads the correction
+  const g = gen; updateProgress(4); preCache(V.m5r1); preCache(V.m5c1);
+  const skel = showSkeleton('correction');
+  showTyping('coach', 'Analyzing grammar...');
+  await wait(1200); if (g !== gen) return; hideTyping();
+  replaceSkeleton(skel, '<div class="correct-card-inline"><div class="cc-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm5.21 7.71l-6 6a1 1 0 01-1.42 0l-3-3a1 1 0 111.42-1.42l2.29 2.3 5.29-5.3a1 1 0 011.42 1.42z"/></svg> Better way to say it</div><div class="corr-text">\u201CHi everyone, I\u2019m Rahul. I\u2019ve just joined the team today, and I\u2019m really excited to be here.\u201D</div></div>');
   if (!muted) await speak(V.m4);
   if (g !== gen) return;
-  await wait(200); if (g !== gen) return;
   addEl('<div class="fix-card-inline"><div class="fix-wrong">\u2715 "I am working in this company from today"</div><div class="fix-right">\u2713 "I\u2019ve just joined the team today"</div></div>');
-  await wait(200); if (g !== gen) return;
+  await wait(300);
   addEl('<div class="fix-card-inline"><div class="fix-wrong">\u2715 "I am very happy for joining"</div><div class="fix-right">\u2713 "I\u2019m really excited to be here"</div></div>');
   await wait(400); if (g !== gen) return;
   showChip('Practice with AI \u2192', true, playM5);
@@ -495,49 +452,40 @@ async function playM5() {
   preCache(V.m5c2); preCache(V.m5r2); preCache(V.m5r3); preCache(V.m5c3); preCache(V.m6);
   divider('Practice Chat with Priya');
   await wait(300); if (g !== gen) return;
-
   for (let i = 0; i < ROUNDS.length; i++) {
     const round = ROUNDS[i];
-    // Priya message appears, then voice reads
     await priyaMsg(round.aiText, round.aiVoice);
     if (g !== gen) return;
     await waitForUser(round.userText);
     if (g !== gen) return;
-    await wait(300); if (g !== gen) return;
-
-    // Fix panel appears, then voice reads correction
+    const skel = showSkeleton('correction');
+    showTyping('coach', 'Checking your response...');
+    await wait(800); if (g !== gen) return; hideTyping();
     let fhtml = '<div class="fix-panel-inline"><div class="fp-label">Quick Fix</div>';
-    round.fixes.forEach(f => {
-      fhtml += '<div class="fp-row"><span class="fp-wrong">' + f.w + '</span><span class="fp-right">' + f.r + '</span><div class="fp-why">' + f.why + '</div></div>';
-    });
+    round.fixes.forEach(f => { fhtml += '<div class="fp-row"><span class="fp-wrong">' + f.w + '</span><span class="fp-right">' + f.r + '</span><div class="fp-why">' + f.why + '</div></div>'; });
     fhtml += '</div>';
-    addEl(fhtml);
+    replaceSkeleton(skel, fhtml);
     if (!muted) await speak(round.corrVoice);
     if (g !== gen) return;
     await wait(400); if (g !== gen) return;
   }
-
-  await coachMsg('Bahut achha, Rahul! You completed the practice. Let\u2019s see your summary.', null);
+  await coachMsg('Bahut achha, Rahul! You completed the practice.', null);
   if (g !== gen) return;
   showChip('View Summary \u2192', true, playM6);
 }
 
 async function playM6() {
   updateProgress(6);
-  $('chatView').style.display = 'none';
-  $('m6').classList.add('active');
+  $('chatView').style.display = 'none'; $('m6').classList.add('active');
   const elapsed = Math.floor((Date.now() - sessionStart) / 1000);
   $('sumTime').textContent = Math.floor(elapsed / 60) + ':' + String(elapsed % 60).padStart(2, '0');
-  // Voice narrates summary
   if (!muted) await speak(V.m6);
 }
 
-function restart() {
-  gen++; stopAudio(); pendingResolve = null; pendingUserText = null;
+function restart() { gen++; stopAudio(); pendingResolve = null; pendingUserText = null;
   $('chat').innerHTML = ''; $('chipRow').innerHTML = ''; $('chatField').value = '';
   $('m6').classList.remove('active'); $('chatView').style.display = 'flex';
-  playM1();
-}
+  playM1(); }
 
 // ===== INIT =====
 document.addEventListener('click', unlockAudio, { once: true });
