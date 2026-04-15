@@ -29,7 +29,7 @@ body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; a
 
 /* ===== PHONE FRAME ===== */
 .phone-frame { width: 360px; height: 800px; border-radius: 40px; overflow: hidden; position: relative; background: var(--grey-100); box-shadow: 0 0 0 2px rgba(0,0,0,0.08), 0 24px 80px rgba(0,0,0,0.15); flex-shrink: 0; }
-.screen { position: absolute; inset: 0; overflow: hidden; background: var(--dark-bg); }
+.screen { position: absolute; inset: 0; overflow: hidden; background: #000; }
 
 /* ===== NAV HEADER ===== */
 .nav-header { position: absolute; top: 0; left: 0; right: 0; z-index: 150; display: flex; align-items: center; gap: 12px; padding: 14px 16px 8px; color: rgba(255,255,255,0.7); }
@@ -47,7 +47,7 @@ body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; a
 /* ===== VOICE MAIN (avatar area — upper half) ===== */
 .voice-main { position: absolute; top: 70px; left: 0; right: 0; height: 260px; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5; }
 .status-text { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.4); margin-bottom: 12px; min-height: 18px; transition: all 0.3s; }
-.avatar-vid { width: 140px; height: 140px; border-radius: 0; object-fit: cover; position: relative; z-index: 1; transition: opacity 0.2s ease; background: transparent; mix-blend-mode: screen; -webkit-mask-image: radial-gradient(ellipse 75% 75% at center, black 55%, transparent 100%); mask-image: radial-gradient(ellipse 75% 75% at center, black 55%, transparent 100%); }
+.avatar-vid { width: 140px; height: 140px; border-radius: 0; object-fit: cover; position: relative; z-index: 1; transition: opacity 0.2s ease; background: transparent; mix-blend-mode: screen; }
 .wave-bars { display: flex; gap: 3px; align-items: center; height: 48px; margin-top: 12px; opacity: 0; transition: opacity 0.3s; }
 .wave-bars.active { opacity: 1; }
 .wave-bars span { width: 4px; border-radius: 99px; background: var(--primary); height: 8px; }
@@ -339,8 +339,8 @@ function preCache(text, pace) { pace = pace || 1.0; const key = text + '|' + pac
 
 // ===== STREAMING CC =====
 let ccTimer = null;
-function streamCC(text, ms) { ms = ms || 140; clearCCStream(); const words = text.split(/\s+/); const el = $('ccText'); el.textContent = ''; $('ccOverlay').classList.add('show'); let i = 0;
-  return new Promise(resolve => { ccTimer = setInterval(() => { if (i >= words.length) { clearInterval(ccTimer); ccTimer = null; resolve(); return; } el.textContent += (i > 0 ? ' ' : '') + words[i]; i++; }, ms); }); }
+function streamCC(text, msPerChar) { msPerChar = msPerChar || 35; clearCCStream(); const el = $('ccText'); el.textContent = ''; $('ccOverlay').classList.add('show'); let i = 0;
+  return new Promise(resolve => { ccTimer = setInterval(() => { if (i >= text.length) { clearInterval(ccTimer); ccTimer = null; resolve(); return; } el.textContent += text[i]; i++; }, msPerChar); }); }
 function clearCCStream() { if (ccTimer) { clearInterval(ccTimer); ccTimer = null; } }
 function clearCC() { clearCCStream(); $('ccOverlay').classList.remove('show'); $('ccText').textContent = ''; }
 
@@ -362,7 +362,7 @@ async function autoListen(userText) {
   const g = gen; setStatus('Listening...'); setAvatar('listen');
   await wait(800); if (g !== gen) return;
   $('waveBars').classList.add('active'); setStatus('');
-  await streamCC(userText, 150);
+  await streamCC(userText, 45);
   if (g !== gen) return;
   $('waveBars').classList.remove('active');
   await wait(500); if (g !== gen) return; clearCC();
