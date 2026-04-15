@@ -214,39 +214,6 @@ body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; a
       <span style="--d:21"></span><span style="--d:22"></span><span style="--d:23"></span>
     </div>
 
-    <!-- Summary Overlay (M6) -->
-    <div class="summary-overlay" id="summaryOverlay">
-      <div class="sum-scroll">
-        <div class="sum-hero">
-          <div class="sum-badge"><svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
-          <div class="sum-title">Session Complete!</div>
-          <div class="sum-sub">Bahut achha kiya, Rahul!</div>
-          <div class="sum-stats">
-            <div class="stat"><div class="stat-val" id="sumTime">0:00</div><div class="stat-lbl">Duration</div></div>
-            <div class="stat"><div class="stat-val">8</div><div class="stat-lbl">Phrases</div></div>
-            <div class="stat"><div class="stat-val">5</div><div class="stat-lbl">Corrections</div></div>
-          </div>
-        </div>
-        <div class="sum-section"><h3>Key Corrections</h3>
-          <div class="sf-row"><span class="sf-wrong">"I am working from today"</span><span class="sf-arrow">&rarr;</span><span class="sf-right">"I've just joined"</span></div>
-          <div class="sf-row"><span class="sf-wrong">"happy for joining"</span><span class="sf-arrow">&rarr;</span><span class="sf-right">"excited to be here"</span></div>
-          <div class="sf-row"><span class="sf-wrong">"doing job in Pune"</span><span class="sf-arrow">&rarr;</span><span class="sf-right">"working at a company"</span></div>
-          <div class="sf-row"><span class="sf-wrong">"making software"</span><span class="sf-arrow">&rarr;</span><span class="sf-right">"developing software"</span></div>
-          <div class="sf-row"><span class="sf-wrong">"good peoples"</span><span class="sf-arrow">&rarr;</span><span class="sf-right">"great people"</span></div>
-        </div>
-        <div class="sum-section"><h3>Phrases Learned</h3>
-          <div class="sp-item">"I've just joined the team"</div>
-          <div class="sp-item">"I'm really excited to be here"</div>
-          <div class="sp-item">"I was working at an IT company"</div>
-          <div class="sp-item">"developing software for banks"</div>
-          <div class="sp-item">"looking forward to learning"</div>
-        </div>
-        <div class="sum-actions">
-          <button class="btn-fill" onclick="restart()">Practice Again</button>
-          <button class="btn-ghost-dark" onclick="restart()">Back to Menu</button>
-        </div>
-      </div>
-    </div>
 
   </div>
 </div>
@@ -578,22 +545,20 @@ function stopCallTimer() { if (callTimerInt) { clearInterval(callTimerInt); call
 async function playM6() {
   const g = gen; updateProgress(6);
   hideCallHeader();
-  const elapsed = Math.floor((Date.now() - sessionStart) / 1000);
-  $('sumTime').textContent = Math.floor(elapsed/60) + ':' + String(elapsed%60).padStart(2,'0');
-  $('summaryOverlay').classList.add('active');
+  setStatus('Summary');
   setAvatar('speak');
   streamCC(V.m6);
   await speak(V.m6);
   clearCC();
   if (g !== gen) return;
   setAvatar('idle');
+  setStatus('Session complete');
 }
 
 // ===== RESTART =====
 function restart() {
   gen++; stopAudio(); clearCC(); stopCallTimer(); hideInterrupt(); hideCallHeader();
   $('waveBars').classList.remove('active');
-  $('summaryOverlay').classList.remove('active');
   setThinking(false); setStatus('');
   playM1();
 }
