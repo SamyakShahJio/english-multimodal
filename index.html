@@ -508,9 +508,9 @@ function clearCC() { document.getElementById('ccOverlay').classList.remove('show
 
 function speak(text, pace) {
   pace = pace || 1.0;
-  setCC(text);
   return new Promise(async (resolve) => {
     unlockAudio(); stopAudio();
+    setCC(text);
     const key = text + '|' + pace;
     if (ttsCache.has(key)) { playUrl(ttsCache.get(key), resolve); return; }
     try {
