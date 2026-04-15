@@ -280,7 +280,7 @@ function preCache(t,p){p=p||1;const k=t+'|'+p;if(ttsCache.has(k))return;
   }).then(r=>r.blob()).then(b=>{ttsCache.set(k,URL.createObjectURL(b));}).catch(()=>{});}
 
 let ccTimer=null;
-function streamCC(t,msPerChar){msPerChar=msPerChar||35;clearCCStream();const el=$('ccText');el.textContent='';$('ccOverlay').classList.add('show');let i=0;
+function streamCC(t,msPerChar){msPerChar=msPerChar||55;clearCCStream();const el=$('ccText');el.textContent='';$('ccOverlay').classList.add('show');let i=0;
   return new Promise(r=>{ccTimer=setInterval(()=>{if(i>=t.length){clearInterval(ccTimer);ccTimer=null;r();return;}el.textContent+=t[i];i++;},msPerChar);});}
 function clearCCStream(){if(ccTimer){clearInterval(ccTimer);ccTimer=null;}}
 function clearCC(){clearCCStream();$('ccOverlay').classList.remove('show');$('ccText').textContent='';}
