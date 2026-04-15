@@ -289,7 +289,7 @@ function playWaitingTone() {
       osc.connect(gain); gain.connect(ctx.destination);
       osc.frequency.value = freq; osc.type = 'sine';
       gain.gain.setValueAtTime(0, now + i * 0.25);
-      gain.gain.linearRampToValueAtTime(0.06, now + i * 0.25 + 0.05);
+      gain.gain.linearRampToValueAtTime(0.09, now + i * 0.25 + 0.05);
       gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.25 + 0.6);
       osc.start(now + i * 0.25); osc.stop(now + i * 0.25 + 0.6);
     });
