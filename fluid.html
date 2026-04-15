@@ -243,7 +243,11 @@ const V = { m1:"Namaste! Main tumhara English learning saathi hoon. Aaj hum ek s
   m5r3:"Great! What are you most looking forward to in this new role?",
   m5c3:"Almost perfect! Say looking forward to, not looking forward for. People is already plural.",
   m6:"Bahut achha, Rahul! Aaj tumne teen important cheezein seekhi. Keep practicing!" };
-const FILLERS = ["Ek second, checking kar raha hoon...","Hmm, soch raha hoon...","Achha, dekhte hain..."];
+function playWaitingTone(){try{const c=new(window.AudioContext||window.webkitAudioContext)();const n=c.currentTime;
+  [440,554].forEach((f,i)=>{const o=c.createOscillator();const g=c.createGain();o.connect(g);g.connect(c.destination);
+    o.frequency.value=f;o.type='sine';g.gain.setValueAtTime(0,n+i*0.25);
+    g.gain.linearRampToValueAtTime(0.06,n+i*0.25+0.05);g.gain.exponentialRampToValueAtTime(0.001,n+i*0.25+0.6);
+    o.start(n+i*0.25);o.stop(n+i*0.25+0.6);});}catch(e){}}
 const U = { m3:"Hello, I am Rahul. I am working in this company from today. I am very happy for joining.",
   r1:"Before this I was doing job in Pune in a IT company.", r2:"I was making software for banks. It was very much interesting work.",
   r3:"I am looking forward for learning new things and meeting good peoples." };
@@ -297,8 +301,8 @@ async function autoListen(ut){const g=gen;setStatus('Listening...');setAvatar('l
   await wait(500);if(g!==gen)return;clearCC();}
 
 async function showThinkingMarkers(label){const g=gen;setStatus(label||'Thinking...');setThinking(true);
-  const f=FILLERS[Math.floor(Math.random()*FILLERS.length)];streamCC(f);setAvatar('speak');
-  await speak(f,1.1);if(g!==gen)return;clearCC();setAvatar('idle');await wait(300);if(g!==gen)return;
+  setAvatar('idle');playWaitingTone();
+  await wait(1800);if(g!==gen)return;
   playReadyChime();setThinking(false);setStatus('');}
 
 // ===== CARD + MODE MANAGEMENT =====
@@ -364,8 +368,7 @@ async function playM5(){
   const g=gen;updateProgress(5);setMode('small');clearCards();
   $('callHeader').classList.add('show');startCallTimer();
   preCache(V.m5c2);preCache(V.m5r3);preCache(V.m5c3);preCache(V.m6);
-  FILLERS.forEach(f=>preCache(f,1.1));
-  $('callStat').innerHTML='<span class="dot-pulse"></span> Connecting...';
+    $('callStat').innerHTML='<span class="dot-pulse"></span> Connecting...';
   await wait(800);if(g!==gen)return;
 
   for(let i=0;i<ROUNDS.length;i++){
@@ -410,8 +413,7 @@ function restart(){gen++;stopAudio();clearCC();stopCallTimer();hideInterrupt();c
 
 document.addEventListener('click',unlockAudio,{once:true});
 document.addEventListener('touchstart',unlockAudio,{once:true});
-preCache(V.m1);preCache(V.m2);FILLERS.forEach(f=>preCache(f,1.1));
-[AV.idle,AV.speak,AV.listen].forEach(u=>{const v=document.createElement('video');v.preload='auto';v.src=u;});
+preCache(V.m1);preCache(V.m2);[AV.idle,AV.speak,AV.listen].forEach(u=>{const v=document.createElement('video');v.preload='auto';v.src=u;});
 playM1();
 </script>
 </body>

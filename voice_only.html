@@ -278,11 +278,23 @@ const V = {
   m6: "Bahut achha, Rahul! Aaj tumne teen important cheezein seekhi. Pehli, I have just joined use karo recent actions ke liye. Doosri, working at bolo, doing job nahi. Aur teesri, people already plural hai. Keep practicing!"
 };
 
-const FILLERS = [
-  "Ek second, checking kar raha hoon...",
-  "Hmm, soch raha hoon...",
-  "Achha, dekhte hain..."
-];
+// Waiting sound instead of spoken fillers
+function playWaitingTone() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const now = ctx.currentTime;
+    // Soft two-tone ascending chime
+    [440, 554].forEach((freq, i) => {
+      const osc = ctx.createOscillator(); const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.frequency.value = freq; osc.type = 'sine';
+      gain.gain.setValueAtTime(0, now + i * 0.25);
+      gain.gain.linearRampToValueAtTime(0.06, now + i * 0.25 + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.25 + 0.6);
+      osc.start(now + i * 0.25); osc.stop(now + i * 0.25 + 0.6);
+    });
+  } catch(e) {}
+}
 
 const U = {
   m3: "Hello, I am Rahul. I am working in this company from today. I am very happy for joining.",
@@ -350,7 +362,7 @@ function preCache(text, pace) {
 let ccTimer = null;
 
 function streamCC(text, msPerChar) {
-  msPerChar = msPerChar || 35;
+  msPerChar = msPerChar || 55;
   clearCCStream();
   const el = $('ccText');
   el.textContent = '';
@@ -430,15 +442,9 @@ async function showThinkingMarkers(contextLabel) {
   const g = gen;
   setStatus(contextLabel || 'Thinking...');
   setThinking(true);
-  // Spoken filler
-  const filler = FILLERS[Math.floor(Math.random() * FILLERS.length)];
-  streamCC(filler);
-  setAvatar('speak');
-  await speak(filler, 1.1);
-  if (g !== gen) return;
-  clearCC();
   setAvatar('idle');
-  await wait(300);
+  playWaitingTone();
+  await wait(1800);
   if (g !== gen) return;
   playReadyChime();
   setThinking(false);
@@ -522,8 +528,7 @@ async function playM5() {
   const g = gen; updateProgress(5);
   showCallHeader(); startCallTimer();
   preCache(V.m5c2); preCache(V.m5r3); preCache(V.m5c3); preCache(V.m6);
-  FILLERS.forEach(f => preCache(f, 1.1));
-  $('callStat').innerHTML = '<span class="dot-pulse"></span> Connecting...';
+    $('callStat').innerHTML = '<span class="dot-pulse"></span> Connecting...';
   await wait(800);
   if (g !== gen) return;
 
@@ -597,7 +602,6 @@ function restart() {
 document.addEventListener('click', unlockAudio, { once: true });
 document.addEventListener('touchstart', unlockAudio, { once: true });
 preCache(V.m1); preCache(V.m2);
-FILLERS.forEach(f => preCache(f, 1.1));
 [AV.idle, AV.speak, AV.listen].forEach(url => { const v = document.createElement('video'); v.preload = 'auto'; v.src = url; });
 playM1();
 </script>
