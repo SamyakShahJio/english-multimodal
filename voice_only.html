@@ -47,7 +47,7 @@ body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; a
 /* ===== VOICE MAIN ===== */
 .voice-main { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5; }
 .status-text { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.4); margin-bottom: 20px; min-height: 18px; transition: all 0.3s; }
-.avatar-vid { width: 160px; height: 160px; border-radius: 0; object-fit: cover; position: relative; z-index: 1; transition: opacity 0.2s ease; background: transparent; mix-blend-mode: screen; }
+.avatar-vid { width: 160px; height: 160px; border-radius: 0; object-fit: cover; position: relative; z-index: 1; transition: opacity 0.2s ease; background: transparent; mix-blend-mode: screen; -webkit-mask-image: radial-gradient(ellipse 75% 75% at center, black 55%, transparent 100%); mask-image: radial-gradient(ellipse 75% 75% at center, black 55%, transparent 100%); }
 
 /* ===== WAVE BARS (user speaking visualization) ===== */
 .wave-bars { display: flex; gap: 3px; align-items: center; height: 48px; margin-top: 16px; opacity: 0; transition: opacity 0.3s; }
@@ -350,7 +350,7 @@ function preCache(text, pace) {
 let ccTimer = null;
 
 function streamCC(text, msPerWord) {
-  msPerWord = msPerWord || 120;
+  msPerWord = msPerWord || 140;
   clearCCStream();
   const words = text.split(/\s+/);
   const el = $('ccText');
