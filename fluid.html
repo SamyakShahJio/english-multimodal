@@ -61,7 +61,7 @@ body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; a
 .wave-bars.active span { animation: waveBar 0.7s ease-in-out infinite; animation-delay: calc(var(--d) * 0.07s); }
 
 /* ===== CARD AREA ===== */
-.card-area { position: absolute; bottom: 60px; left: 16px; right: 16px; z-index: 50; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; transition: top 0.4s; }
+.card-area { position: absolute; bottom: 60px; left: 16px; right: 16px; z-index: 50; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-bottom: 40px; transition: top 0.4s; }
 .card-area::-webkit-scrollbar { width: 0; }
 .card-area.below-medium { top: 280px; }
 .card-area.below-small { top: 130px; }
@@ -138,7 +138,6 @@ body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; a
 .call-name { font-size: 14px; font-weight: 900; }
 .call-stat { font-size: 11px; color: var(--sparkle); font-weight: 700; margin-top: 2px; display: flex; align-items: center; justify-content: flex-end; gap: 6px; }
 .dot-pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--sparkle); animation: dotPulse 1.5s infinite; display: inline-block; }
-.call-time { font-size: 10px; color: rgba(255,255,255,0.2); margin-top: 1px; }
 
 /* ===== SUMMARY ===== */
 .summary-overlay { position: absolute; inset: 0; z-index: 300; background: var(--dark-bg); display: flex; flex-direction: column; opacity: 0; pointer-events: none; transition: opacity 0.4s; }
@@ -204,7 +203,6 @@ body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; a
   <div class="call-header" id="callHeader">
     <div class="call-name">Priya</div>
     <div class="call-stat" id="callStat"><span class="dot-pulse"></span> Connected</div>
-    <div class="call-time" id="callTime">00:00</div>
   </div>
 
   <div class="aurora" id="aurora"><div class="aurora-band ab1"></div><div class="aurora-band ab2"></div><div class="aurora-band ab3"></div></div>
@@ -376,7 +374,7 @@ async function playM5(){
     $('callStat').innerHTML='<span class="dot-pulse"></span> Priya speaking...';
     setAvatar('speak');
     addCard('<div class="overlay-panel"><div class="ct-label">Live Transcript</div><div class="ct-name">Priya</div><div class="ct-text">'+rd.aiText+'</div></div>');
-    showInterrupt();streamCC(rd.aiVoice);await speak(rd.aiVoice);hideInterrupt();clearCC();if(g!==gen)return;
+    showInterrupt();await speak(rd.aiVoice);hideInterrupt();if(g!==gen)return;
 
     $('callStat').innerHTML='<span class="dot-pulse" style="background:var(--white)"></span> Your turn';
     await autoListen(rd.userText);if(g!==gen)return;
@@ -391,10 +389,10 @@ async function playM5(){
     rd.fixes.forEach(f=>{fh+='<div class="fp-row"><span class="fp-wrong">'+f.w+'</span><span class="fp-right">'+f.r+'</span><div class="fp-why">'+f.why+'</div></div>';});
     fh+='</div>';addCard(fh);
     $('callStat').innerHTML='<span class="dot-pulse"></span> Coach speaking...';
-    setAvatar('speak');showInterrupt();streamCC(rd.corrVoice);await speak(rd.corrVoice);hideInterrupt();clearCC();
+    setAvatar('speak');showInterrupt();await speak(rd.corrVoice);hideInterrupt();
     if(g!==gen)return;if(i<ROUNDS.length-1)await wait(600);}
 
-  stopCallTimer();$('callStat').innerHTML='<span class="dot-pulse" style="background:var(--secondary)"></span> Call ended';
+  $('callStat').innerHTML='<span class="dot-pulse" style="background:var(--secondary)"></span> Call ended';
   setAvatar('idle');await wait(1500);if(g!==gen)return;playM6();}
 
 function startCallTimer(){callSecs=0;if(callTimerInt)clearInterval(callTimerInt);callTimerInt=setInterval(()=>{callSecs++;$('callTime').textContent=String(Math.floor(callSecs/60)).padStart(2,'0')+':'+String(callSecs%60).padStart(2,'0');},1000);}
