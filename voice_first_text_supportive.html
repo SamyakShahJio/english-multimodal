@@ -412,12 +412,12 @@ async function playM2() {
   preCache(V.m4fixes);
   // Brief skeleton to show latency marker, then real card + voice
   const skel = showCardSkeleton('scenario');
-  await wait(600); if (g !== gen) return;
+  await wait(1400); if (g !== gen) return;
   replaceCardSkeleton(skel, '<div class="overlay-card"><div class="sc-tag">OFFICE &middot; FORMAL</div><div class="sc-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M20 7h-4V5c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zM10 5h4v2h-4V5z"/></svg></div><div class="sc-en">Introduce yourself to your new team</div><div class="sc-hint"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/></svg><span>Your name, role, and why you\'re excited</span></div></div>');
   showInterrupt(); streamCC(V.m2); await speak(V.m2);
   hideInterrupt(); clearCC(); if (g !== gen) return;
   setAvatar('listen'); setStatus('');
-  await wait(500); if (g !== gen) return;
+  await wait(1800); if (g !== gen) return;
   playM3();
 }
 
@@ -438,18 +438,19 @@ async function playM4() {
   preCache(V.m5r1); preCache(V.m5c1);
   // Brief skeleton, then correction card + voice
   const skel = showCardSkeleton('correction');
-  await wait(600); if (g !== gen) return;
+  await wait(1400); if (g !== gen) return;
   replaceCardSkeleton(skel, '<div class="overlay-correction"><div class="cc-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm5.21 7.71l-6 6a1 1 0 01-1.42 0l-3-3a1 1 0 111.42-1.42l2.29 2.3 5.29-5.3a1 1 0 011.42 1.42z"/></svg> Better way to say it</div><div class="corr-text">\u201CHi everyone, I\u2019m Rahul. I\u2019ve just joined the team today, and I\u2019m really excited to be here.\u201D</div></div>');
   showInterrupt(); streamCC(V.m4); await speak(V.m4);
   if (g !== gen) return; clearCC();
   // Fix cards
   streamCC(V.m4fixes); await speak(V.m4fixes);
   hideInterrupt(); clearCC(); if (g !== gen) return;
-  addCard('<div class="overlay-fix"><div class="fix-wrong">\u2715 "I am working in this company from today"</div><div class="fix-right">\u2713 "I\u2019ve just joined the team today"</div></div>');
-  await wait(300);
-  addCard('<div class="overlay-fix"><div class="fix-wrong">\u2715 "I am very happy for joining"</div><div class="fix-right">\u2713 "I\u2019m really excited to be here"</div></div>');
+  const fsk1 = showCardSkeleton('fix'); await wait(1100); if (g !== gen) return;
+  replaceCardSkeleton(fsk1, '<div class="overlay-fix"><div class="fix-wrong">\u2715 "I am working in this company from today"</div><div class="fix-right">\u2713 "I\u2019ve just joined the team today"</div></div>');
+  const fsk2 = showCardSkeleton('fix'); await wait(1100); if (g !== gen) return;
+  replaceCardSkeleton(fsk2, '<div class="overlay-fix"><div class="fix-wrong">\u2715 "I am very happy for joining"</div><div class="fix-right">\u2713 "I\u2019m really excited to be here"</div></div>');
   setAvatar('idle'); setStatus('');
-  await wait(1000); if (g !== gen) return;
+  await wait(2200); if (g !== gen) return;
   playM5();
 }
 
