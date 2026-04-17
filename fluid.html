@@ -198,7 +198,7 @@ body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; a
 
   <div class="card-area below-medium" id="cardArea"></div>
 
-  <button class="interrupt-btn" id="interruptBtn" onclick="onInterrupt()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg> Cut in</button>
+  <button class="interrupt-btn" id="interruptBtn" onclick="onInterrupt()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg> Interrupt</button>
 
   <div class="call-header" id="callHeader">
     <div class="call-name">Priya</div>
@@ -210,7 +210,7 @@ body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; a
   <div class="voice-strip" id="voiceStrip"><span style="--d:0"></span><span style="--d:1"></span><span style="--d:2"></span><span style="--d:3"></span><span style="--d:4"></span><span style="--d:5"></span><span style="--d:6"></span><span style="--d:7"></span><span style="--d:8"></span><span style="--d:9"></span><span style="--d:10"></span><span style="--d:11"></span><span style="--d:12"></span><span style="--d:13"></span><span style="--d:14"></span><span style="--d:15"></span><span style="--d:16"></span><span style="--d:17"></span><span style="--d:18"></span><span style="--d:19"></span><span style="--d:20"></span><span style="--d:21"></span><span style="--d:22"></span><span style="--d:23"></span></div>
 
   <div class="summary-overlay" id="summaryOverlay"><div class="sum-scroll">
-    <div class="sum-hero"><div class="sum-badge"><svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div><div class="sum-title">Session Complete!</div><div class="sum-sub">Bahut achha kiya, Raahul!</div>
+    <div class="sum-hero"><div class="sum-badge"><svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div><div class="sum-title">Session Complete!</div><div class="sum-sub">Bahut achha kiya, Rahul!</div>
       <div class="sum-stats"><div class="stat"><div class="stat-val" id="sumTime">0:00</div><div class="stat-lbl">Duration</div></div><div class="stat"><div class="stat-val">8</div><div class="stat-lbl">Phrases</div></div><div class="stat"><div class="stat-val">5</div><div class="stat-lbl">Corrections</div></div></div></div>
     <div class="sum-section"><h3>Key Corrections</h3>
       <div class="sf-row"><span class="sf-wrong">"I am working from today"</span><span class="sf-arrow">&rarr;</span><span class="sf-right">"I've just joined"</span></div>
@@ -232,25 +232,25 @@ const AV = { idle:'https://raw.githubusercontent.com/sunit1986/JioBharatIQ_Serve
 
 const V = { m1:"Namaste! Main tumhari English learning saathi hun. Aaj hum ek situation ke liye practice karenge. Socho ki tum ek new office mein apna introduction de rahe ho.",
   m2:"Imagine you have just joined a new company. Your manager asks you to introduce yourself to the team. Think about your name, your role, and why you are excited. Try saying it in English.",
-  m4:"Great attempt! Here is a more natural way to say it. Hi everyone, I am Raahul. I have just joined the team today, and I am really excited to be here.",
+  m4:"Great attempt! Here is a more natural way to say it. Hi everyone, I am Rahul. I have just joined the team today, and I am really excited to be here.",
   m4f:"Two quick fixes. Instead of I am working in this company from today, say I have just joined the team today. And instead of I am very happy for joining, say I am really excited to be here.",
-  m5r1:"Now let us practice! I will be your colleague Priya. Hey Raahul, nice to meet you! So what were you doing before joining us?",
+  m5r1:"Now let us practice! I will be your colleague Priya. Hey Rahul, nice to meet you! So what were you doing before joining us?",
   m5c1:"Good! Small fix. Say, I was working at an IT company in Pune, instead of doing job in Pune.",
   m5r2:"That sounds interesting! What kind of projects were you working on there?",
   m5c2:"Nice! Say developing software, not making software. And it is very interesting, not very much interesting.",
   m5r3:"Great! What are you most looking forward to in this new role?",
   m5c3:"Almost perfect! Say looking forward to, not looking forward for. People is already plural.",
-  m6:"Bahut achha, Raahul! Aaj tumne teen important cheezein seekhi. Keep practicing!" };
+  m6:"Bahut achha, Rahul! Aaj tumne teen important cheezein seekhi. Keep practicing!" };
 function playWaitingTone(){try{const c=new(window.AudioContext||window.webkitAudioContext)();const n=c.currentTime;
   [440,554].forEach((f,i)=>{const o=c.createOscillator();const g=c.createGain();o.connect(g);g.connect(c.destination);
     o.frequency.value=f;o.type='sine';g.gain.setValueAtTime(0,n+i*0.25);
     g.gain.linearRampToValueAtTime(0.06,n+i*0.25+0.05);g.gain.exponentialRampToValueAtTime(0.001,n+i*0.25+0.6);
     o.start(n+i*0.25);o.stop(n+i*0.25+0.6);});}catch(e){}}
-const U = { m3:"Hello, I am Raahul. I am working in this company from today. I am very happy for joining.",
+const U = { m3:"Hello, I am Rahul. I am working in this company from today. I am very happy for joining.",
   r1:"Before this I was doing job in Pune in a IT company.", r2:"I was making software for banks. It was very much interesting work.",
   r3:"I am looking forward for learning new things and meeting good peoples." };
 const ROUNDS = [
-  { aiVoice:V.m5r1, corrVoice:V.m5c1, userText:U.r1, aiText:"Hey Raahul, nice to meet you! So what were you doing before joining us?",
+  { aiVoice:V.m5r1, corrVoice:V.m5c1, userText:U.r1, aiText:"Hey Rahul, nice to meet you! So what were you doing before joining us?",
     fixes:[{w:'"doing job in Pune"',r:'"working at a company"',why:'"Working at" is standard'},{w:'"a IT company"',r:'"an IT company"',why:'Use "an" before vowel sounds'}] },
   { aiVoice:V.m5r2, corrVoice:V.m5c2, userText:U.r2, aiText:"What kind of projects were you working on there?",
     fixes:[{w:'"making software"',r:'"developing software"',why:'"Develop" is professional'},{w:'"very much interesting"',r:'"very interesting"',why:'No "much" needed'}] },
@@ -354,7 +354,7 @@ async function playM4(){
   setStatus('Coach feedback');setAvatar('speak');preCache(V.m5r1);preCache(V.m5c1);
   const sk=showCardSkel('correction');
   showInterrupt();streamCC(V.m4);await speak(V.m4);if(g!==gen)return;clearCC();
-  replaceSkel(sk,'<div class="overlay-correction"><div class="cc-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm5.21 7.71l-6 6a1 1 0 01-1.42 0l-3-3a1 1 0 111.42-1.42l2.29 2.3 5.29-5.3a1 1 0 011.42 1.42z"/></svg> Better way</div><div class="corr-text">\u201CHi everyone, I\u2019m Raahul. I\u2019ve just joined the team today, and I\u2019m really excited to be here.\u201D</div></div>');
+  replaceSkel(sk,'<div class="overlay-correction"><div class="cc-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm5.21 7.71l-6 6a1 1 0 01-1.42 0l-3-3a1 1 0 111.42-1.42l2.29 2.3 5.29-5.3a1 1 0 011.42 1.42z"/></svg> Better way</div><div class="corr-text">\u201CHi everyone, I\u2019m Rahul. I\u2019ve just joined the team today, and I\u2019m really excited to be here.\u201D</div></div>');
   streamCC(V.m4f);await speak(V.m4f);hideInterrupt();clearCC();if(g!==gen)return;
   addCard('<div class="overlay-fix"><div class="fix-wrong">\u2715 "I am working in this company from today"</div><div class="fix-right">\u2713 "I\u2019ve just joined the team today"</div></div>');
   await wait(300);

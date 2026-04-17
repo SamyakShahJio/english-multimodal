@@ -221,7 +221,7 @@ body { font-family: 'JioType', sans-serif; background: #f0f0f5; display: flex; a
         <div class="sum-hero">
           <div class="sum-badge"><svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
           <div class="sum-title">Session Complete!</div>
-          <div class="sum-sub">Great work, Raahul!</div>
+          <div class="sum-sub">Great work, Rahul!</div>
           <div class="sum-stats">
             <div class="stat"><div class="stat-val" id="sumTime">0:00</div><div class="stat-lbl">Duration</div></div>
             <div class="stat"><div class="stat-val">8</div><div class="stat-lbl">Phrases</div></div>
@@ -261,22 +261,22 @@ const V = {
   m1b: "Aaj hum ek situation ke liye practice karenge.",
   m2: "Imagine you have just joined a new company. Your manager asks you to introduce yourself.",
   m4: "Great attempt! Here is a more natural way to say it.",
-  m5r1: "Hey Raahul, nice to meet you! So what were you doing before joining us?",
+  m5r1: "Hey Rahul, nice to meet you! So what were you doing before joining us?",
   m5c1: "Good! Say, I was working at an IT company in Pune, instead of doing job in Pune.",
   m5r2: "What kind of projects were you working on there?",
   m5c2: "Nice! Say developing software, not making software.",
   m5r3: "What are you most looking forward to in this new role?",
   m5c3: "Say looking forward to, not looking forward for. People is already plural.",
-  m6: "Bahut achha, Raahul! Keep practicing!"
+  m6: "Bahut achha, Rahul! Keep practicing!"
 };
 const U = {
-  m3: "Hello, I am Raahul. I am working in this company from today. I am very happy for joining.",
+  m3: "Hello, I am Rahul. I am working in this company from today. I am very happy for joining.",
   r1: "Before this I was doing job in Pune in a IT company.",
   r2: "I was making software for banks. It was very much interesting work.",
   r3: "I am looking forward for learning new things and meeting good peoples."
 };
 const ROUNDS = [
-  { aiText: "Hey Raahul, nice to meet you! So what were you doing before joining us?", aiVoice: V.m5r1, corrVoice: V.m5c1, userText: U.r1,
+  { aiText: "Hey Rahul, nice to meet you! So what were you doing before joining us?", aiVoice: V.m5r1, corrVoice: V.m5c1, userText: U.r1,
     fixes: [{ w: '"doing job in Pune"', r: '"working at a company"', why: '"Working at" is standard' }, { w: '"a IT company"', r: '"an IT company"', why: 'Use "an" before vowel sounds' }] },
   { aiText: "What kind of projects were you working on there?", aiVoice: V.m5r2, corrVoice: V.m5c2, userText: U.r2,
     fixes: [{ w: '"making software"', r: '"developing software"', why: '"Develop" is professional' }, { w: '"very much interesting"', r: '"very interesting"', why: 'No "much" needed' }] },
@@ -438,7 +438,7 @@ async function playM4() {
   const skel = showSkeleton('correction');
   showTyping('coach', 'Analyzing grammar...');
   await wait(1200); if (g !== gen) return; hideTyping();
-  replaceSkeleton(skel, '<div class="correct-card-inline"><div class="cc-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm5.21 7.71l-6 6a1 1 0 01-1.42 0l-3-3a1 1 0 111.42-1.42l2.29 2.3 5.29-5.3a1 1 0 011.42 1.42z"/></svg> Better way to say it</div><div class="corr-text">\u201CHi everyone, I\u2019m Raahul. I\u2019ve just joined the team today, and I\u2019m really excited to be here.\u201D</div></div>');
+  replaceSkeleton(skel, '<div class="correct-card-inline"><div class="cc-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm5.21 7.71l-6 6a1 1 0 01-1.42 0l-3-3a1 1 0 111.42-1.42l2.29 2.3 5.29-5.3a1 1 0 011.42 1.42z"/></svg> Better way to say it</div><div class="corr-text">\u201CHi everyone, I\u2019m Rahul. I\u2019ve just joined the team today, and I\u2019m really excited to be here.\u201D</div></div>');
   if (!muted) await speak(V.m4);
   if (g !== gen) return;
   addEl('<div class="fix-card-inline"><div class="fix-wrong">\u2715 "I am working in this company from today"</div><div class="fix-right">\u2713 "I\u2019ve just joined the team today"</div></div>');
@@ -470,7 +470,7 @@ async function playM5() {
     if (g !== gen) return;
     await wait(400); if (g !== gen) return;
   }
-  await coachMsg('Bahut achha, Raahul! You completed the practice.', null);
+  await coachMsg('Bahut achha, Rahul! You completed the practice.', null);
   if (g !== gen) return;
   showChip('View Summary \u2192', true, playM6);
 }
