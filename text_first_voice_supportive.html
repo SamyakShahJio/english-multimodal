@@ -423,7 +423,7 @@ async function playM1() {
 async function playM2() {
   const g = gen; updateProgress(2); preCache(V.m4);
   const skel = showSkeleton('scenario');
-  await wait(1500); if (g !== gen) return;
+  await wait(900); if (g !== gen) return;
   replaceSkeleton(skel, '<div class="chat-card"><div class="scenario-card-inline"><div class="sc-tag">OFFICE &middot; FORMAL</div><div class="sc-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M20 7h-4V5c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zM10 5h4v2h-4V5z"/></svg></div><div class="sc-en">Introduce yourself to your new team</div><div class="sc-hint"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/></svg><span>Your name, role, and why you\'re excited</span></div></div></div>');
   await wait(300); if (g !== gen) return;
   await coachMsg('Try it in English! How would you introduce yourself?', V.m2);
@@ -437,15 +437,15 @@ async function playM4() {
   const g = gen; updateProgress(4); preCache(V.m5r1); preCache(V.m5c1);
   const skel = showSkeleton('correction');
   showTyping('coach', 'Analyzing grammar...');
-  await wait(1800); if (g !== gen) return; hideTyping();
+  await wait(700); if (g !== gen) return; hideTyping();
   replaceSkeleton(skel, '<div class="correct-card-inline"><div class="cc-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm5.21 7.71l-6 6a1 1 0 01-1.42 0l-3-3a1 1 0 111.42-1.42l2.29 2.3 5.29-5.3a1 1 0 011.42 1.42z"/></svg> Better way to say it</div><div class="corr-text">\u201CHi everyone, I\u2019m Rahul. I\u2019ve just joined the team today, and I\u2019m really excited to be here.\u201D</div></div>');
   if (!muted) await speak(V.m4);
   if (g !== gen) return;
-  const fsk1 = showSkeleton('fix'); await wait(1100); if (g !== gen) return;
+  const fsk1 = showSkeleton('fix'); await wait(700); if (g !== gen) return;
   replaceSkeleton(fsk1, '<div class="fix-card-inline"><div class="fix-wrong">\u2715 "I am working in this company from today"</div><div class="fix-right">\u2713 "I\u2019ve just joined the team today"</div></div>');
-  const fsk2 = showSkeleton('fix'); await wait(1100); if (g !== gen) return;
+  const fsk2 = showSkeleton('fix'); await wait(700); if (g !== gen) return;
   replaceSkeleton(fsk2, '<div class="fix-card-inline"><div class="fix-wrong">\u2715 "I am very happy for joining"</div><div class="fix-right">\u2713 "I\u2019m really excited to be here"</div></div>');
-  await wait(1200); if (g !== gen) return;
+  await wait(800); if (g !== gen) return;
   showChip('Practice with AI \u2192', true, playM5);
 }
 
@@ -462,14 +462,14 @@ async function playM5() {
     if (g !== gen) return;
     const skel = showSkeleton('correction');
     showTyping('coach', 'Checking your response...');
-    await wait(1500); if (g !== gen) return; hideTyping();
+    await wait(1000); if (g !== gen) return; hideTyping();
     let fhtml = '<div class="fix-panel-inline"><div class="fp-label">Quick Fix</div>';
     round.fixes.forEach(f => { fhtml += '<div class="fp-row"><span class="fp-wrong">' + f.w + '</span><span class="fp-right">' + f.r + '</span><div class="fp-why">' + f.why + '</div></div>'; });
     fhtml += '</div>';
     replaceSkeleton(skel, fhtml);
     if (!muted) await speak(round.corrVoice);
     if (g !== gen) return;
-    await wait(1200); if (g !== gen) return;
+    await wait(800); if (g !== gen) return;
   }
   await coachMsg('Bahut achha, Rahul! You completed the practice.', null);
   if (g !== gen) return;
